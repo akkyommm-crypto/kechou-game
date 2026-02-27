@@ -1,0 +1,8 @@
+{
+"name":"県庁所在地マスター",
+"short_name":"県庁所在地",
+"start_url":"./index.html",
+"display":"standalone",
+"background_color":"#ffffff",
+"theme_color":"#4facfe"
+}

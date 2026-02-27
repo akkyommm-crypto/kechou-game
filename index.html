@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>県庁所在地マスター</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4facfe">
+
+<style>
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+  background:linear-gradient(135deg,#4facfe,#00f2fe);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.card{
+  background:white;
+  width:95%;
+  max-width:420px;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  padding:20px;
+  text-align:center;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  background:#4facfe;
+  color:white;
+}
+
+button.secondary{ background:#888; }
+
+input{
+  width:100%;
+  padding:10px;
+  font-size:18px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  margin-top:8px;
+}
+
+img{
+  width:85%;
+  max-width:260px;
+  margin:10px 0;
+}
+
+.hidden{display:none;}
+
+.info{
+  display:flex;
+  justify-content:space-between;
+  font-size:14px;
+  margin-top:8px;
+}
+
+#result{
+  min-height:28px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+
+.correct{ color:green; }
+.wrong{ color:red; }
+
+.flash-correct{ background:#eaffea; }
+.flash-wrong{ background:#ffeaea; }
+</style>
+</head>
+
+<body>
+
+<div class="card" id="menu">
+<h2>県庁所在地マスター</h2>
+<div id="bestDisplay"></div>
+<button id="btn1" onclick="startGame(1)">Lv1 東日本</button>
+<button id="btn2" onclick="startGame(2)">Lv2 西日本</button>
+<button id="btn3" onclick="startGame(3)">Lv3 全国</button>
+<button id="btn4" onclick="startGame(4)">Lv4 東日本（画像のみ）</button>
+<button id="btn5" onclick="startGame(5)">Lv5 西日本（画像のみ）</button>
+<button id="btn6" onclick="startGame(6)">LvMAX 全国（県名＋県庁所在地）</button>
+</div>
+
+<div class="card hidden" id="game">
+<h2 id="prefName"></h2>
+<img id="prefImage">
+<div id="result"></div>
+<input id="capitalAnswer" placeholder="県庁所在地を入力">
+<input id="prefAnswer" class="hidden" placeholder="県名を入力">
+<button onclick="checkAnswer()">答える</button>
+<div class="info">
+<span>正解: <span id="score">0</span></span>
+<span>残り: <span id="remaining">0</span></span>
+</div>
+<button class="secondary" onclick="backToMenu()">レベル選択に戻る</button>
+</div>
+
+<div class="card hidden" id="finish">
+<h2>結果</h2>
+<h3 id="finalScore"></h3>
+<h3 id="rank"></h3>
+<button onclick="restartSameLevel()">もう一度挑戦</button>
+<button class="secondary" onclick="backToMenu()">レベル選択へ</button>
+</div>
+
+<script>
+
+// ===== データ（47都道府県） =====
+const eastJapan=[
+{name:"北海道",capital:"札幌市",file:"hokkaido.png"},
+{name:"青森県",capital:"青森市",file:"aomori.png"},
+{name:"岩手県",capital:"盛岡市",file:"iwate.png"},
+{name:"宮城県",capital:"仙台市",file:"miyagi.png"},
+{name:"秋田県",capital:"秋田市",file:"akita.png"},
+{name:"山形県",capital:"山形市",file:"yamagata.png"},
+{name:"福島県",capital:"福島市",file:"fukushima.png"},
+{name:"茨城県",capital:"水戸市",file:"ibaraki.png"},
+{name:"栃木県",capital:"宇都宮市",file:"tochigi.png"},
+{name:"群馬県",capital:"前橋市",file:"gunma.png"},
+{name:"埼玉県",capital:"さいたま市",file:"saitama.png"},
+{name:"千葉県",capital:"千葉市",file:"chiba.png"},
+{name:"東京都",capital:"新宿区",file:"tokyo.png"},
+{name:"神奈川県",capital:"横浜市",file:"kanagawa.png"}];
+
+const westJapan=[
+{name:"新潟県",capital:"新潟市",file:"niigata.png"},
+{name:"富山県",capital:"富山市",file:"toyama.png"},
+{name:"石川県",capital:"金沢市",file:"ishikawa.png"},
+{name:"福井県",capital:"福井市",file:"fukui.png"},
+{name:"山梨県",capital:"甲府市",file:"yamanashi.png"},
+{name:"長野県",capital:"長野市",file:"nagano.png"},
+{name:"岐阜県",capital:"岐阜市",file:"gifu.png"},
+{name:"静岡県",capital:"静岡市",file:"shizuoka.png"},
+{name:"愛知県",capital:"名古屋市",file:"aichi.png"},
+{name:"三重県",capital:"津市",file:"mie.png"},
+{name:"滋賀県",capital:"大津市",file:"shiga.png"},
+{name:"京都府",capital:"京都市",file:"kyoto.png"},
+{name:"大阪府",capital:"大阪市",file:"osaka.png"},
+{name:"兵庫県",capital:"神戸市",file:"hyogo.png"},
+{name:"奈良県",capital:"奈良市",file:"nara.png"},
+{name:"和歌山県",capital:"和歌山市",file:"wakayama.png"},
+{name:"鳥取県",capital:"鳥取市",file:"tottori.png"},
+{name:"島根県",capital:"松江市",file:"shimane.png"},
+{name:"岡山県",capital:"岡山市",file:"okayama.png"},
+{name:"広島県",capital:"広島市",file:"hiroshima.png"},
+{name:"山口県",capital:"山口市",file:"yamaguchi.png"},
+{name:"徳島県",capital:"徳島市",file:"tokushima.png"},
+{name:"香川県",capital:"高松市",file:"kagawa.png"},
+{name:"愛媛県",capital:"松山市",file:"ehime.png"},
+{name:"高知県",capital:"高知市",file:"kochi.png"},
+{name:"福岡県",capital:"福岡市",file:"fukuoka.png"},
+{name:"佐賀県",capital:"佐賀市",file:"saga.png"},
+{name:"長崎県",capital:"長崎市",file:"nagasaki.png"},
+{name:"熊本県",capital:"熊本市",file:"kumamoto.png"},
+{name:"大分県",capital:"大分市",file:"oita.png"},
+{name:"宮崎県",capital:"宮崎市",file:"miyazaki.png"},
+{name:"鹿児島県",capital:"鹿児島市",file:"kagoshima.png"},
+{name:"沖縄県",capital:"那覇市",file:"okinawa.png"}];
+
+const allJapan=eastJapan.concat(westJapan);
+
+let currentList=[], current, score=0, levelMode=1, totalQuestions=0;
+
+function startGame(level){
+levelMode=level;
+score=0;
+
+document.getElementById("menu").classList.add("hidden");
+document.getElementById("finish").classList.add("hidden");
+document.getElementById("game").classList.remove("hidden");
+
+if(level==1||level==4){currentList=[...eastJapan];}
+if(level==2||level==5){currentList=[...westJapan];}
+if(level==3||level==6){currentList=[...allJapan];}
+
+totalQuestions=currentList.length;
+document.getElementById("prefAnswer").classList.toggle("hidden",level!=6);
+nextQuestion();
+}
+
+function nextQuestion(){
+if(currentList.length===0){finishGame();return;}
+let index=Math.floor(Math.random()*currentList.length);
+current=currentList.splice(index,1)[0];
+document.getElementById("prefImage").src="images/"+current.file;
+document.getElementById("prefName").textContent=(levelMode<=3)?current.name:"";
+document.getElementById("capitalAnswer").value="";
+document.getElementById("prefAnswer").value="";
+document.getElementById("result").textContent="";
+document.getElementById("result").className="";
+document.getElementById("score").textContent=score;
+document.getElementById("remaining").textContent=currentList.length;
+}
+
+function checkAnswer(){
+let cap=document.getElementById("capitalAnswer").value.trim();
+let pref=document.getElementById("prefAnswer").value.trim();
+let correct=false;
+
+if(levelMode==6){
+if(cap===current.capital && pref===current.name){correct=true;}
+}else{
+if(cap===current.capital){correct=true;}
+}
+
+let result=document.getElementById("result");
+let gameCard=document.getElementById("game");
+
+if(correct){
+score++;
+result.textContent="正解！";
+result.className="correct";
+gameCard.classList.add("flash-correct");
+}else{
+result.textContent="不正解 正解："+current.name+" / "+current.capital;
+result.className="wrong";
+gameCard.classList.add("flash-wrong");
+}
+
+setTimeout(()=>{
+gameCard.classList.remove("flash-correct","flash-wrong");
+nextQuestion();
+},800);
+}
+
+function finishGame(){
+document.getElementById("game").classList.add("hidden");
+document.getElementById("finish").classList.remove("hidden");
+
+let percent=Math.round((score/totalQuestions)*100);
+let rankText="";
+
+if(percent===100){rankText="👑 真のマスター";}
+else if(percent>=90){rankText="🏆 Sランク";}
+else if(percent>=70){rankText="Aランク";}
+else if(percent>=50){rankText="Bランク";}
+else{rankText="もう一度挑戦！";}
+
+document.getElementById("finalScore").textContent="スコア："+score+" / "+totalQuestions+" ("+percent+"%)";
+document.getElementById("rank").textContent=rankText;
+
+saveBestScore(percent);
+displayBest();
+}
+
+function getBestKey(){
+return "best_capital_level_" + levelMode;
+}
+
+function saveBestScore(percent){
+let key=getBestKey();
+let best=localStorage.getItem(key)||0;
+if(percent>best){
+localStorage.setItem(key,percent);
+}
+}
+
+function displayBest(){
+let text="各レベル ベストスコア\n";
+for(let i=1;i<=6;i++){
+let key="best_capital_level_"+i;
+let best=localStorage.getItem(key);
+if(best){
+text+="Lv"+i+" : "+best+"%\n";
+}
+}
+document.getElementById("bestDisplay").innerText=text;
+updateCrown();
+}
+
+function updateCrown(){
+for(let i=1;i<=6;i++){
+let key="best_capital_level_"+i;
+let best=localStorage.getItem(key);
+let btn=document.getElementById("btn"+i);
+btn.innerHTML=btn.innerText.replace(" 👑","");
+if(best==100){
+btn.innerHTML=btn.innerText+" 👑";
+}
+}
+}
+
+function backToMenu(){
+document.getElementById("game").classList.add("hidden");
+document.getElementById("finish").classList.add("hidden");
+document.getElementById("menu").classList.remove("hidden");
+displayBest();
+}
+
+function restartSameLevel(){
+startGame(levelMode);
+}
+
+displayBest();
+
+// PWA
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js");
+}
+</script>
+</body>
+</html>
