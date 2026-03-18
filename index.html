@@ -189,19 +189,37 @@ function closeStats() { document.getElementById("statsOverlay").style.display = 
 
 async function renderCharts() {
     try {
-        const res = await fetch(GAS_URL); const data = await res.json(); if (data.length === 0) return;
-        const lastData = data.slice(-10);
-        const labels = lastData.map(d => d.date.split(' ')[0].slice(5));
-        
+        const res = await fetch(GAS_URL);
+        const rawData = await res.json();
+        if (rawData.length === 0) return;
+
+        // --- 1日のベストを集計するロジック ---
+        const dailyBest = {};
+        rawData.forEach(d => {
+            const date = d.date.split(' ')[0]; // "2026-03-18" の形式
+            if (!dailyBest[date]) {
+                dailyBest[date] = { percent: d.percent, time: d.time };
+            } else {
+                // 正解率は最大値を採用
+                dailyBest[date].percent = Math.max(dailyBest[date].percent, d.percent);
+                // タイムは最小値（最速）を採用
+                dailyBest[date].time = Math.min(dailyBest[date].time, d.time);
+            }
+        });
+
+        const sortedDates = Object.keys(dailyBest).sort().slice(-10); // 直近10日分
+        const labels = sortedDates.map(d => d.slice(5)); // "03-18" の形式
+        const scoreData = sortedDates.map(d => dailyBest[d].percent);
+        const timeData = sortedDates.map(d => dailyBest[d].time);
+        // ------------------------------------
+
         const chartOptions = { 
             scales: { 
                 y: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } }, 
                 x: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } } 
             },
             plugins: { legend: { labels: { color: "#fff", font: { size: 12 } } } },
-            elements: {
-                line: { tension: 0 } // ★ここを0にすることで直線の折れ線になります
-            }
+            elements: { line: { tension: 0 } }
         };
 
         if (window.scChart) window.scChart.destroy();
@@ -210,12 +228,13 @@ async function renderCharts() {
             data: { 
                 labels: labels, 
                 datasets: [{ 
-                    label: '正解率(%)', 
-                    data: lastData.map(d => d.percent), 
+                    label: '1日ベスト正解率(%)', 
+                    data: scoreData, 
                     borderColor: '#00d9ff', 
                     backgroundColor: 'rgba(0,217,255,0.1)', 
-                    fill: true,
-                    pointRadius: 4 // 点を見やすく
+                    fill: true, 
+                    pointRadius: 5,
+                    pointBackgroundColor: '#00d9ff'
                 }] 
             },
             options: chartOptions
@@ -227,17 +246,17 @@ async function renderCharts() {
             data: { 
                 labels: labels, 
                 datasets: [{ 
-                    label: 'タイム(秒)', 
-                    data: lastData.map(d => d.time), 
-                    borderColor: '#ff3b3b',
-                    pointRadius: 4
+                    label: '1日最速タイム(秒)', 
+                    data: timeData, 
+                    borderColor: '#ff3b3b', 
+                    pointRadius: 5,
+                    pointBackgroundColor: '#ff3b3b'
                 }] 
             },
             options: chartOptions
         });
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error("データ取得エラー:", e); }
 }
-
 function displayBest(){
     let text = "<b>[RANKING DATA]</b><br>";
     for(let i=1;i<=6;i++){
