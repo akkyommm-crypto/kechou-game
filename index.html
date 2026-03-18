@@ -3,53 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PREF_MASTER: THE QUEST Ver1.1</title>
+<title>PREF_MASTER: THE QUEST Ver1.2</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root { --bg: #05080a; --panel: #12181f; --text: #f0f0f0; --gold: #ffcc00; --red: #ff3b3b; --blue: #00d9ff; --green: #00ff66; --border: #333; --overlay: rgba(5, 8, 10, 0.95); }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Consolas', 'Courier New', sans-serif; }
 body { margin: 0; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
-
 .card { background: var(--panel); width: 100%; max-width: 400px; border-radius: 4px; padding: 20px; border: 2px solid var(--border); box-shadow: 0 0 30px rgba(0,0,0,0.8); position: relative; }
 h2 { color: var(--gold); text-align: center; margin: 0 0 15px 0; font-size: 1.2rem; letter-spacing: 4px; border-bottom: 1px solid var(--gold); padding-bottom: 10px; }
-
-/* ステータス・テキスト */
 .status-bar { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 8px; color: #666; font-weight: bold; }
 #bestDisplay { font-size: 10px; color: var(--gold); background: #000; padding: 10px; margin-bottom: 15px; border-left: 3px solid var(--gold); line-height: 1.6; }
-
-/* コマンドボタン */
-button { width: 100%; padding: 14px; margin: 5px 0; font-size: 14px; border: 1px solid var(--blue); border-radius: 2px; background: #111; color: var(--blue); font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.1s; }
+button { width: 100%; padding: 14px; margin: 5px 0; font-size: 14px; border: 1px solid var(--blue); border-radius: 2px; background: #111; color: var(--blue); font-weight: bold; cursor: pointer; text-transform: uppercase; }
 button:active { background: var(--blue); color: #000; }
 button.revive { border-color: var(--red); color: var(--red); background: #200; }
 button.stats-btn { border-color: var(--green); color: var(--green); }
 button.secondary { border-color: #444; color: #777; font-size: 10px; padding: 8px; margin-top: 10px; }
-
-/* バトルエリア */
-.battle-zone { background: #000; border: 1px solid #222; padding: 15px; margin: 15px 0; min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+.battle-zone { background: #000; border: 1px solid #222; padding: 15px; margin: 15px 0; min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 #prefName { font-size: 2rem; color: #fff; text-shadow: 0 0 15px var(--blue); margin-bottom: 15px; }
 #prefImage { width: 180px; height: 120px; object-fit: contain; background: #fff; border: 3px solid var(--gold); margin-bottom: 15px; }
-
-/* 入力エリア */
 input { width: 100%; padding: 15px; font-size: 1.3rem; border: none; border-bottom: 2px solid var(--gold); background: transparent; color: var(--green); text-align: center; margin-bottom: 10px; outline: none; }
 #result { height: 35px; font-weight: bold; font-size: 1.2rem; text-align: center; margin-bottom: 5px; }
 .correct { color: var(--green); text-shadow: 0 0 10px var(--green); }
 .wrong { color: var(--red); text-shadow: 0 0 10px var(--red); }
-
-/* ポップアップ・オーバーレイ */
 #statsOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 .stats-content { width: 100%; max-width: 400px; background: #111; border: 1px solid var(--green); padding: 15px; position: relative; }
-.close-btn { position: absolute; top: -40px; right: 0; color: #fff; font-size: 20px; border: 1px solid #fff; padding: 5px 15px; cursor: pointer; }
-
+.close-btn { position: absolute; top: -40px; right: 0; color: #fff; font-size: 16px; border: 1px solid #fff; padding: 5px 15px; cursor: pointer; }
+.range-btns { display: flex; gap: 5px; margin-bottom: 10px; }
+.range-btns button { flex: 1; margin: 0; font-size: 12px; padding: 8px; border-width: 1px; }
 .hidden { display: none; }
 </style>
 </head>
-
 <body>
+
 <div class="card" id="menu">
     <div class="status-bar"><span>SYSTEM: ONLINE</span><span id="playTime">00:00</span></div>
     <h2>PREF_MASTER: QUEST</h2>
     <div id="bestDisplay"></div>
-    
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
         <button onclick="startGame(1)">LV.1 東日本</button>
         <button onclick="startGame(2)">LV.2 西日本</button>
@@ -93,20 +82,27 @@ input { width: 100%; padding: 15px; font-size: 1.3rem; border: none; border-bott
 <div id="statsOverlay">
     <div class="stats-content">
         <div class="close-btn" onclick="closeStats()">× CLOSE</div>
-        <h3 style="color:var(--green); font-size:12px; margin:0 0 10px 0;">DATA ANALYZE: LATEST 10</h3>
+        <h3 style="color:var(--green); font-size:12px; margin:0 0 10px 0;">DATA ANALYZE</h3>
+        <div class="range-btns">
+            <button onclick="updateRange('day')" style="border-color:var(--blue); color:var(--blue);">日次</button>
+            <button onclick="updateRange('month')" style="border-color:var(--gold); color:var(--gold);">月次</button>
+            <button onclick="updateRange('all')" style="border-color:var(--green); color:var(--green);">全期間</button>
+        </div>
         <canvas id="scoreChart" style="margin-bottom:20px;"></canvas>
         <canvas id="timeChart"></canvas>
     </div>
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzxFUSzbL0dgkkjwr_IiFAiuLscQPFN70qOyK8OnQQbqm_j2eyXFBurTjK5LBsY-doCxQ/exec"; // ★要貼り替え
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzxFUSzbL0dgkkjwr_IiFAiuLscQPFN70qOyK8OnQQbqm_j2eyXFBurTjK5LBsY-doCxQ/exec"; 
 
 const eastJapan=[{name:"北海道",capital:"札幌市",file:"hokkaido.png"},{name:"青森県",capital:"青森市",file:"aomori.png"},{name:"岩手県",capital:"盛岡市",file:"iwate.png"},{name:"宮城県",capital:"仙台市",file:"miyagi.png"},{name:"秋田県",capital:"秋田市",file:"akita.png"},{name:"山形県",capital:"山形市",file:"yamagata.png"},{name:"福島県",capital:"福島市",file:"fukushima.png"},{name:"茨城県",capital:"水戸市",file:"ibaraki.png"},{name:"栃木県",capital:"宇都宮市",file:"tochigi.png"},{name:"群馬県",capital:"前橋市",file:"gunma.png"},{name:"埼玉県",capital:"さいたま市",file:"saitama.png"},{name:"千葉県",capital:"千葉市",file:"chiba.png"},{name:"東京都",capital:"新宿区",file:"tokyo.png"},{name:"神奈川県",capital:"横浜市",file:"kanagawa.png"}];
 const westJapan=[{name:"新潟県",capital:"新潟市",file:"niigata.png"},{name:"富山県",capital:"富山市",file:"toyama.png"},{name:"石川県",capital:"金沢市",file:"ishikawa.png"},{name:"福井県",capital:"福井市",file:"fukui.png"},{name:"山梨県",capital:"甲府市",file:"yamanashi.png"},{name:"長野県",capital:"長野市",file:"nagano.png"},{name:"岐阜県",capital:"岐阜市",file:"gifu.png"},{name:"静岡県",capital:"静岡市",file:"shizuoka.png"},{name:"愛知県",capital:"名古屋市",file:"aichi.png"},{name:"三重県",capital:"津市",file:"mie.png"},{name:"滋賀県",capital:"大津市",file:"shiga.png"},{name:"京都府",capital:"京都市",file:"kyoto.png"},{name:"大阪府",capital:"大阪市",file:"osaka.png"},{name:"兵庫県",capital:"神戸市",file:"hyogo.png"},{name:"奈良県",capital:"奈良市",file:"nara.png"},{name:"和歌山県",capital:"和歌山市",file:"wakayama.png"},{name:"鳥取県",capital:"鳥取市",file:"tottori.png"},{name:"島根県",capital:"松江市",file:"shimane.png"},{name:"岡山県",capital:"岡山市",file:"okayama.png"},{name:"広島県",capital:"広島市",file:"hiroshima.png"},{name:"山口県",capital:"山口市",file:"yamaguchi.png"},{name:"徳島県",capital:"徳島市",file:"tokushima.png"},{name:"香川県",capital:"高松市",file:"kagawa.png"},{name:"愛媛県",capital:"松山市",file:"ehime.png"},{name:"高知県",capital:"高知市",file:"kochi.png"},{name:"福岡県",capital:"福岡市",file:"fukuoka.png"},{name:"佐賀県",capital:"佐賀市",file:"saga.png"},{name:"長崎県",capital:"長崎市",file:"nagasaki.png"},{name:"熊本県",capital:"熊本市",file:"kumamoto.png"},{name:"大分県",capital:"大分市",file:"oita.png"},{name:"宮崎県",capital:"宮崎市",file:"miyazaki.png"},{name:"鹿児島県",capital:"鹿児島市",file:"kagoshima.png"},{name:"沖縄県",capital:"那覇市",file:"okinawa.png"}];
 const allJapan = eastJapan.concat(westJapan);
 
 let currentList=[], current, score=0, levelMode=1, totalQuestions=0, sessionStartTime=Date.now(), gameStartTime=0, sessionWrongNames=[];
+let rawChartData = []; 
+let currentRange = 'day';
 
 const app = {
     nextQuestion: function() {
@@ -122,14 +118,10 @@ const app = {
         document.getElementById("result").textContent="";
         document.getElementById("remaining").textContent = currentList.length;
     },
-
     checkAnswer: function() {
         let cap = document.getElementById("capitalAnswer").value.trim().replace(/[市|区]$/, "");
-        let pref = document.getElementById("prefAnswer").value.trim();
         let targetCap = current.capital.replace(/[市|区]$/, "");
-        let isCorrect = (levelMode == 6) ? (cap === targetCap && pref === current.name) : (cap === targetCap);
-
-        if(isCorrect){
+        if(cap === targetCap){
             score++;
             document.getElementById("result").textContent = "CRITICAL HIT!";
             document.getElementById("result").className = "correct";
@@ -142,25 +134,19 @@ const app = {
         document.getElementById("ansBtn").classList.add("hidden");
         document.getElementById("nextBtn").classList.remove("hidden");
     },
-
     finishGame: async function() {
         const clearTime = Math.floor((Date.now() - gameStartTime) / 1000);
-        document.getElementById("game").classList.add("hidden");
+        document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
         document.getElementById("finish").classList.remove("hidden");
         let percent = Math.round((score/totalQuestions)*100);
         document.getElementById("finalScore").innerHTML = `討伐率: ${percent}%`;
         document.getElementById("finalTime").textContent = `TIME: ${clearTime}s (${score}/${totalQuestions})`;
         document.getElementById("wrongList").textContent = sessionWrongNames.length > 0 ? "未達成: " + sessionWrongNames.join(", ") : "ALL CLEAR!";
-        
         let todayWrong = JSON.parse(localStorage.getItem("today_wrong") || "[]");
         localStorage.setItem("today_wrong", JSON.stringify([...new Set([...todayWrong, ...sessionWrongNames])]));
-
         if(percent > (localStorage.getItem("best_p_"+levelMode)||0)) localStorage.setItem("best_p_"+levelMode, percent);
         if(percent === 100 && clearTime < (localStorage.getItem("best_t_"+levelMode)||9999)) localStorage.setItem("best_t_"+levelMode, clearTime);
-
-        try {
-            await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({level: levelMode, score: score, percent: percent, time: clearTime, wrongPrefs: sessionWrongNames.join(",")}) });
-        } catch(e) {}
+        try { await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({level: levelMode, score: score, percent: percent, time: clearTime, wrongPrefs: sessionWrongNames.join(",")}) }); } catch(e) {}
         displayBest();
     }
 };
@@ -169,7 +155,6 @@ function startGame(level){
     document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
     levelMode=level; score=0; sessionWrongNames=[]; gameStartTime = Date.now();
     document.getElementById("game").classList.remove("hidden");
-
     if(level==='revive') {
         let targets = JSON.parse(localStorage.getItem("today_wrong") || "[]");
         if(targets.length === 0) { alert("リベンジ対象がいません！"); backToMenu(); return; }
@@ -181,120 +166,78 @@ function startGame(level){
     totalQuestions = currentList.length; app.nextQuestion();
 }
 
-function openStats() {
+async function openStats() {
     document.getElementById("statsOverlay").style.display = "flex";
-    renderCharts();
-}
-function closeStats() { document.getElementById("statsOverlay").style.display = "none"; }
-
-async function renderCharts() {
     try {
         const res = await fetch(GAS_URL);
-        const allData = await res.json();
-        if (!allData || allData.length === 0) return;
-
-        // --- 1. 日付ごとの「最強の1件」を抽出する ---
-        const dailyBestMap = {};
-
-        allData.forEach(d => {
-            // 文字列の先頭10文字だけを抜く (例: "2026-03-18 11:19" -> "2026-03-18")
-            // これで時間が何時であっても「同じ日」として集計されます
-            const dateOnly = String(d.date).substring(0, 10); 
-            
-            const p = Number(d.percent) || 0;
-            const t = Number(d.time) || 0;
-
-            if (!dailyBestMap[dateOnly]) {
-                dailyBestMap[dateOnly] = { date: dateOnly, maxP: p, minT: t };
-            } else {
-                // 同じ日付なら、より良いスコア・タイムで上書き
-                if (p > dailyBestMap[dateOnly].maxP) {
-                    dailyBestMap[dateOnly].maxP = p;
-                }
-                if (t > 0 && (dailyBestMap[dateOnly].minT === 0 || t < dailyBestMap[dateOnly].minT)) {
-                    dailyBestMap[dateOnly].minT = t;
-                }
-            }
-        });
-
-        // --- 2. 日付順に並べて直近10日分にする ---
-        const sortedData = Object.values(dailyBestMap).sort((a, b) => {
-            return new Date(a.date) - new Date(b.date);
-        }).slice(-10);
-
-        const labels = sortedData.map(d => d.date.slice(5)); // グラフには "03-18" と表示
-        const scoreData = sortedData.map(d => d.maxP);
-        const timeData = sortedData.map(d => d.minT);
-
-        // --- 3. グラフ描画 ---
-        const commonOptions = {
-            scales: { 
-                y: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } }, 
-                x: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } } 
-            },
-            plugins: { legend: { labels: { color: "#fff", font: { size: 11 } } } },
-            elements: { line: { tension: 0 } }
-        };
-
-        if (window.scChart) window.scChart.destroy();
-        window.scChart = new Chart(document.getElementById('scoreChart'), {
-            type: 'line',
-            data: { 
-                labels: labels, 
-                datasets: [{ 
-                    label: '日次ベスト正解率(%)', 
-                    data: scoreData, 
-                    borderColor: '#00d9ff', 
-                    backgroundColor: 'rgba(0,217,255,0.1)', 
-                    fill: true, 
-                    pointRadius: 6,
-                    pointBackgroundColor: '#00d9ff'
-                }] 
-            },
-            options: commonOptions
-        });
-
-        if (window.tmChart) window.tmChart.destroy();
-        window.tmChart = new Chart(document.getElementById('timeChart'), {
-            type: 'line',
-            data: { 
-                labels: labels, 
-                datasets: [{ 
-                    label: '日次最速タイム(秒)', 
-                    data: timeData, 
-                    borderColor: '#ff3b3b', 
-                    pointRadius: 6,
-                    pointBackgroundColor: '#ff3b3b'
-                }] 
-            },
-            options: commonOptions
-        });
-    } catch(e) { console.error("分析エラー:", e); }
+        rawChartData = await res.json();
+        renderCharts();
+    } catch(e) { console.error("データ取得失敗", e); }
 }
-    
+
+function updateRange(range) {
+    currentRange = range;
+    renderCharts();
+}
+
+function renderCharts() {
+    if (!rawChartData || rawChartData.length === 0) return;
+    const dailyBestMap = {};
+    rawChartData.forEach(d => {
+        const dateStr = String(d.date);
+        const key = currentRange === 'month' ? dateStr.substring(0, 7) : dateStr.substring(0, 10);
+        const p = Number(d.percent) || 0;
+        const t = Number(d.time) || 0;
+        if (!dailyBestMap[key]) {
+            dailyBestMap[key] = { label: key, maxP: p, minT: t };
+        } else {
+            if (p > dailyBestMap[key].maxP) dailyBestMap[key].maxP = p;
+            if (t > 0 && (dailyBestMap[key].minT === 0 || t < dailyBestMap[key].minT)) dailyBestMap[key].minT = t;
+        }
+    });
+    let sortedData = Object.values(dailyBestMap).sort((a, b) => a.label.localeCompare(b.label));
+    if (currentRange === 'day') sortedData = sortedData.slice(-14);
+    else if (currentRange === 'month') sortedData = sortedData.slice(-12);
+    const labels = sortedData.map(d => currentRange === 'day' ? d.label.slice(5) : d.label);
+    const scoreData = sortedData.map(d => d.maxP);
+    const timeData = sortedData.map(d => d.minT);
+    const commonOptions = {
+        scales: { 
+            y: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } }, 
+            x: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } } 
+        },
+        plugins: { legend: { labels: { color: "#fff", font: { size: 10 } } } },
+        elements: { line: { tension: 0 }, point: { radius: currentRange === 'all' ? 2 : 5 } }
+    };
+    if (window.scChart) window.scChart.destroy();
+    window.scChart = new Chart(document.getElementById('scoreChart'), {
+        type: 'line',
+        data: { labels: labels, datasets: [{ label: '最高正解率(%)', data: scoreData, borderColor: '#00d9ff', backgroundColor: 'rgba(0,217,255,0.1)', fill: true }] },
+        options: commonOptions
+    });
+    if (window.tmChart) window.tmChart.destroy();
+    window.tmChart = new Chart(document.getElementById('timeChart'), {
+        type: 'line',
+        data: { labels: labels, datasets: [{ label: '最速タイム(秒)', data: timeData, borderColor: '#ff3b3b' }] },
+        options: commonOptions
+    });
+}
+
+function closeStats() { document.getElementById("statsOverlay").style.display = "none"; }
 function displayBest(){
     let text = "<b>[RANKING DATA]</b><br>";
     for(let i=1;i<=6;i++){
         let p = localStorage.getItem("best_p_"+i) || 0; let t = localStorage.getItem("best_t_"+i) || "-";
-        text += `LV${i}:${p}%(${t}s) | `;
-        if(i==3) text += "<br>";
+        text += `LV${i}:${p}%(${t}s) | `; if(i==3) text += "<br>";
     }
     document.getElementById("bestDisplay").innerHTML = text;
 }
-
-function backToMenu(){
-    document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-    document.getElementById("menu").classList.remove("hidden");
-    displayBest();
-}
-
+function backToMenu(){ document.querySelectorAll('.card').forEach(c => c.classList.add('hidden')); document.getElementById("menu").classList.remove("hidden"); displayBest(); }
 function restartSameLevel(){ startGame(levelMode); }
-
 setInterval(()=>{
     let sec = Math.floor((Date.now()-sessionStartTime)/1000);
     document.getElementById("playTime").textContent = `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
 },1000);
-
 window.onload = () => { displayBest(); };
 </script>
 </body>
