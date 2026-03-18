@@ -191,44 +191,58 @@ async function renderCharts() {
     try {
         const res = await fetch(GAS_URL);
         const rawData = await res.json();
-        if (rawData.length === 0) return;
+        if (!rawData || rawData.length === 0) return;
 
-        // --- 1日のベストを集計するロジック ---
+        // --- デイリーベスト集計（ロジック強化版） ---
         const dailyBest = {};
+
         rawData.forEach(d => {
-            const date = d.date.split(' ')[0]; // "2026-03-18" の形式
+            // 日付のみ抽出 (例: "2026-03-18")
+            const date = d.date.split(' ')[0]; 
+            const currentP = Number(d.percent) || 0;
+            const currentTime = Number(d.time) || 9999;
+
             if (!dailyBest[date]) {
-                dailyBest[date] = { percent: d.percent, time: d.time };
+                dailyBest[date] = { percent: currentP, time: currentTime };
             } else {
-                // 正解率は最大値を採用
-                dailyBest[date].percent = Math.max(dailyBest[date].percent, d.percent);
-                // タイムは最小値（最速）を採用
-                dailyBest[date].time = Math.min(dailyBest[date].time, d.time);
+                // その日の最高正解率を更新
+                if (currentP > dailyBest[date].percent) {
+                    dailyBest[date].percent = currentP;
+                }
+                // その日の最速タイムを更新 (0秒は除外)
+                if (currentTime > 0 && currentTime < dailyBest[date].time) {
+                    dailyBest[date].time = currentTime;
+                }
             }
         });
 
-        const sortedDates = Object.keys(dailyBest).sort().slice(-10); // 直近10日分
-        const labels = sortedDates.map(d => d.slice(5)); // "03-18" の形式
+        // 日付順にソートして直近10日分を抽出
+        const sortedDates = Object.keys(dailyBest).sort().slice(-10);
+        const labels = sortedDates.map(d => d.slice(5)); // "MM-DD"形式
         const scoreData = sortedDates.map(d => dailyBest[d].percent);
         const timeData = sortedDates.map(d => dailyBest[d].time);
-        // ------------------------------------
+        // ------------------------------------------
 
         const chartOptions = { 
             scales: { 
                 y: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } }, 
                 x: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } } 
             },
-            plugins: { legend: { labels: { color: "#fff", font: { size: 12 } } } },
-            elements: { line: { tension: 0 } }
+            plugins: { 
+                legend: { labels: { color: "#fff", font: { size: 12 } } },
+                tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}` } }
+            },
+            elements: { line: { tension: 0 } } // 直線
         };
 
+        // スコアグラフ描画
         if (window.scChart) window.scChart.destroy();
         window.scChart = new Chart(document.getElementById('scoreChart'), {
             type: 'line',
             data: { 
                 labels: labels, 
                 datasets: [{ 
-                    label: '1日ベスト正解率(%)', 
+                    label: '日次ベスト正解率(%)', 
                     data: scoreData, 
                     borderColor: '#00d9ff', 
                     backgroundColor: 'rgba(0,217,255,0.1)', 
@@ -240,13 +254,14 @@ async function renderCharts() {
             options: chartOptions
         });
 
+        // タイムグラフ描画
         if (window.tmChart) window.tmChart.destroy();
         window.tmChart = new Chart(document.getElementById('timeChart'), {
             type: 'line',
             data: { 
                 labels: labels, 
                 datasets: [{ 
-                    label: '1日最速タイム(秒)', 
+                    label: '日次最速タイム(秒)', 
                     data: timeData, 
                     borderColor: '#ff3b3b', 
                     pointRadius: 5,
@@ -255,7 +270,9 @@ async function renderCharts() {
             },
             options: chartOptions
         });
-    } catch(e) { console.error("データ取得エラー:", e); }
+    } catch(e) { 
+        console.error("データ取得または解析エラー:", e); 
+    }
 }
 function displayBest(){
     let text = "<b>[RANKING DATA]</b><br>";
