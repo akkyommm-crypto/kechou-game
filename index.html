@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PREF_MASTER: THE QUEST</title>
+<title>PREF_MASTER: THE QUEST Ver1</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root { --bg: #05080a; --panel: #12181f; --text: #f0f0f0; --gold: #ffcc00; --red: #ff3b3b; --blue: #00d9ff; --green: #00ff66; --border: #333; --overlay: rgba(5, 8, 10, 0.95); }
@@ -193,50 +193,54 @@ async function renderCharts() {
         const allData = await res.json();
         if (!allData || allData.length === 0) return;
 
-        // --- 1. 日付ごとの「最強値」を抽出する器 ---
+        // --- 1. 日付ごとの「最強の1件」だけを格納する箱 ---
         const dailyBestMap = {};
 
         allData.forEach(d => {
-            // "2026-03-18 12:34:56" から "2026-03-18" だけを取り出す
-            const dateStr = d.date.split(' ')[0]; 
-            const p = parseFloat(d.percent) || 0;
-            const t = parseFloat(d.time) || 9999;
+            // 日付文字列から「時間」を切り離して「年月日」だけにする
+            // "2026-03-18 12:00:00" -> "2026-03-18"
+            const dateOnly = String(d.date).split(' ')[0]; 
+            
+            // 文字列を「数値」に変換（ここが重要！）
+            const p = Number(d.percent) || 0;
+            const t = Number(d.time) || 0;
 
-            if (!dailyBestMap[dateStr]) {
+            if (!dailyBestMap[dateOnly]) {
                 // その日初めてのデータなら登録
-                dailyBestMap[dateStr] = { maxP: p, minT: t };
+                dailyBestMap[dateOnly] = { date: dateOnly, maxP: p, minT: t };
             } else {
-                // すでにデータがあるなら「より良い方」に上書き
-                if (p > dailyBestMap[dateStr].maxP) dailyBestMap[dateStr].maxP = p;
-                if (t > 0 && t < dailyBestMap[dateStr].minT) dailyBestMap[dateStr].minT = t;
+                // すでにデータがあるなら「より良い数値」を上書き保存
+                if (p > dailyBestMap[dateOnly].maxP) {
+                    dailyBestMap[dateOnly].maxP = p;
+                }
+                // タイムは0より大きく、かつ今の記録より速い(小さい)場合のみ更新
+                if (t > 0 && (dailyBestMap[dateOnly].minT === 0 || t < dailyBestMap[dateOnly].minT)) {
+                    dailyBestMap[dateOnly].minT = t;
+                }
             }
         });
 
-        // --- 2. グラフ用に「日付順」に並べ替えて直近10日分に絞る ---
-        const sortedDates = Object.keys(dailyBestMap).sort(); // 日付で昇順ソート
-        const last10Days = sortedDates.slice(-10); // 直近10日間分だけ採用
+        // --- 2. 日付順に並べて直近10日分を抽出 ---
+        const sortedData = Object.values(dailyBestMap).sort((a, b) => {
+            return new Date(a.date) - new Date(b.date);
+        }).slice(-10);
 
-        // --- 3. グラフ描画用の配列を作成（ここで1日1データが確定する） ---
-        const labels = [];
-        const scoreData = [];
-        const timeData = [];
+        // --- 3. グラフ用の配列を作成 ---
+        const labels = sortedData.map(d => d.date.slice(5)); // "03-18" (月-日) のみにする
+        const scoreData = sortedData.map(d => d.maxP);
+        const timeData = sortedData.map(d => d.minT);
 
-        last10Days.forEach(date => {
-            labels.push(date.slice(5)); // "03-18" の形式
-            scoreData.push(dailyBestMap[date].maxP);
-            timeData.push(dailyBestMap[date].minT);
-        });
-
-        // --- 4. グラフ描画 ---
+        // --- 4. グラフ描画の設定 ---
         const commonOptions = {
             scales: { 
                 y: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } }, 
                 x: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } } 
             },
-            plugins: { legend: { labels: { color: "#fff", font: { size: 12 } } } },
-            elements: { line: { tension: 0 } } // まっすぐな線
+            plugins: { legend: { labels: { color: "#fff", font: { size: 11 } } } },
+            elements: { line: { tension: 0 } } // まっすぐな折れ線
         };
 
+        // 正解率グラフ
         if (window.scChart) window.scChart.destroy();
         window.scChart = new Chart(document.getElementById('scoreChart'), {
             type: 'line',
@@ -248,13 +252,14 @@ async function renderCharts() {
                     borderColor: '#00d9ff', 
                     backgroundColor: 'rgba(0,217,255,0.1)', 
                     fill: true, 
-                    pointRadius: 6,
+                    pointRadius: 5,
                     pointBackgroundColor: '#00d9ff'
                 }] 
             },
             options: commonOptions
         });
 
+        // タイムグラフ
         if (window.tmChart) window.tmChart.destroy();
         window.tmChart = new Chart(document.getElementById('timeChart'), {
             type: 'line',
@@ -264,13 +269,15 @@ async function renderCharts() {
                     label: '日次最速タイム(秒)', 
                     data: timeData, 
                     borderColor: '#ff3b3b', 
-                    pointRadius: 6,
+                    pointRadius: 5,
                     pointBackgroundColor: '#ff3b3b'
                 }] 
             },
             options: commonOptions
         });
-    } catch(e) { console.error("分析エラー:", e); }
+    } catch(e) { 
+        console.error("グラフ更新エラー:", e); 
+    }
 }
     
 function displayBest(){
