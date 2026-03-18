@@ -3,46 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>県庁所在地マスター Pro Sync + 復習</title>
+<title>県庁所在地マスター：THE QUEST</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root { --main: #2c3e50; --accent: #3498db; --success: #27ae60; --danger: #e74c3c; --revive: #9b59b6; }
+:root { --bg: #0a0e14; --panel: #1a1f26; --text: #e0e0e0; --gold: #f1c40f; --red: #e74c3c; --blue: #3498db; --green: #2ecc71; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; font-family: "Hiragino Sans", sans-serif; background: #e0eafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
-.card { background: white; width: 100%; max-width: 420px; border-radius: 25px; padding: 20px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 4px solid var(--main); position: relative; }
-h2 { color: var(--main); margin: 0 0 10px 0; font-size: 1.3rem; }
-button { width: 100%; padding: 12px; margin: 5px 0; font-size: 15px; border: none; border-radius: 12px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0 #2980b9; }
-button:active { transform: translateY(2px); box-shadow: none; }
-button.revive { background: var(--revive); box-shadow: 0 4px 0 #8e44ad; }
-button.secondary { background: #95a5a6; box-shadow: 0 4px 0 #7f8c8d; }
-input { width: 100%; padding: 12px; font-size: 18px; border-radius: 12px; border: 2px solid #ddd; margin-top: 10px; text-align: center; outline: none; }
-img { width: 100%; max-width: 160px; height: 110px; object-fit: contain; margin: 10px 0; }
+body { margin: 0; font-family: "Courier New", "Hiragino Sans", sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
+
+/* バトルパネル風デザイン */
+.card { background: var(--panel); width: 100%; max-width: 420px; border-radius: 10px; padding: 20px; text-align: center; border: 3px solid var(--gold); box-shadow: 0 0 20px rgba(241, 196, 15, 0.3); position: relative; }
+h2 { color: var(--gold); text-shadow: 2px 2px #000; letter-spacing: 2px; margin: 0 0 15px 0; font-size: 1.4rem; border-bottom: 2px solid var(--gold); display: inline-block; padding-bottom: 5px; }
+
+/* ボタン：ゲームのコマンド風 */
+button { width: 100%; padding: 14px; margin: 6px 0; font-size: 16px; border: 2px solid var(--text); border-radius: 5px; background: #333; color: white; font-weight: bold; cursor: pointer; position: relative; overflow: hidden; }
+button:active { background: var(--gold); color: #000; transform: scale(0.98); }
+button::before { content: '▶'; position: absolute; left: 10px; color: var(--gold); }
+
+button.lv-btn { border-color: var(--blue); }
+button.revive { background: #630d0d; border-color: var(--red); color: #fff; }
+button.secondary { border-color: #777; font-size: 12px; }
+
+/* 入力欄：近未来コンソール風 */
+input { width: 100%; padding: 12px; font-size: 20px; border-radius: 5px; border: 2px solid var(--gold); background: #000; color: var(--green); margin-top: 10px; text-align: center; font-family: monospace; }
+
+img { width: 100%; max-width: 180px; height: 120px; object-fit: contain; margin: 15px 0; filter: drop-shadow(0 0 10px var(--blue)); border: 1px solid #444; background: #fff; }
 .hidden { display: none; }
-#result { font-size: 20px; font-weight: bold; min-height: 28px; margin: 8px 0; }
-.correct { color: var(--success); }
-.wrong { color: var(--danger); font-size: 14px; }
-#comboDisplay { position: absolute; top: 10px; right: 20px; color: var(--danger); font-weight: bold; }
-#bestDisplay { background: #f8f9fa; padding: 8px; border-radius: 10px; font-size: 10px; text-align: left; margin: 10px 0; border: 1px dashed #ccc; line-height: 1.3; }
-.stats-container { margin-top: 10px; padding: 8px; background: #fff; border-radius: 15px; border: 1px solid #eee; }
-#loading { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:1000; justify-content:center; align-items:center; font-weight:bold; }
+
+/* 演出 */
+#result { font-size: 24px; font-weight: bold; min-height: 35px; margin: 10px 0; }
+.correct { color: var(--green); text-shadow: 0 0 10px var(--green); }
+.wrong { color: var(--red); text-shadow: 0 0 10px var(--red); }
+
+#comboDisplay { position: absolute; top: 15px; right: 15px; color: var(--red); font-size: 1.2rem; font-weight: bold; font-style: italic; }
+#playTime { font-size: 11px; color: #aaa; margin-bottom: 5px; text-align: right; }
+
+/* グラフエリア */
+.stats-container { margin-top: 15px; background: #000; padding: 10px; border: 1px solid #444; border-radius: 5px; }
+canvas { max-height: 140px; margin-bottom: 10px; }
+
+#bestDisplay { font-size: 10px; color: var(--gold); text-align: left; background: rgba(0,0,0,0.5); padding: 8px; margin: 10px 0; border: 1px solid #333; }
 </style>
 </head>
+
 <body>
-<div id="loading">通信中...</div>
 <div class="card" id="menu">
-    <h2>🗺️ 県庁所在地マスター</h2>
-    <div id="playTime" style="font-size:11px; color:#888;">今日のプレイ時間：0:0:0</div>
+    <div id="playTime">PLAY TIME: 00:00:00</div>
+    <h2>PREF_MASTER: QUEST</h2>
     <div id="bestDisplay"></div>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-        <button onclick="startGame(1)">Lv1 東日本</button>
-        <button onclick="startGame(2)">Lv2 西日本</button>
-        <button onclick="startGame(3)">Lv3 全国</button>
-        <button onclick="startGame(4)">Lv4 画像(東)</button>
-        <button onclick="startGame(5)">Lv5 画像(西)</button>
-        <button onclick="startGame(6)">LvMAX 究極</button>
+    
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <button class="lv-btn" onclick="startGame(1)">LV.1 東日本</button>
+        <button class="lv-btn" onclick="startGame(2)">LV.2 西日本</button>
+        <button class="lv-btn" onclick="startGame(3)">LV.3 全国</button>
+        <button class="lv-btn" onclick="startGame(4)">LV.4 視覚(東)</button>
+        <button class="lv-btn" onclick="startGame(5)">LV.5 視覚(西)</button>
+        <button class="lv-btn" onclick="startGame(6)">LV.MAX 究極</button>
     </div>
-    <button class="revive" id="reviveBtn" onclick="startGame('revive')">🔥 復習モード (苦手克服)</button>
-    <div class="stats-container"><canvas id="scoreChart"></canvas></div>
+
+    <button class="revive" id="reviveBtn" onclick="startGame('revive')">⚔️ 今日の復習(リベンジ)</button>
+
+    <div class="stats-container">
+        <canvas id="scoreChart"></canvas>
+        <canvas id="timeChart"></canvas>
+    </div>
 </div>
 
 <div class="card hidden" id="game">
@@ -50,27 +73,33 @@ img { width: 100%; max-width: 160px; height: 110px; object-fit: contain; margin:
     <h2 id="prefName"></h2>
     <img id="prefImage">
     <div id="result"></div>
-    <input id="capitalAnswer" placeholder="所在地を入力" autocomplete="off">
-    <input id="prefAnswer" class="hidden" placeholder="県名を入力" autocomplete="off">
-    <button id="ansBtn" onclick="app.checkAnswer()">答える</button>
-    <button id="nextBtn" class="hidden" onclick="app.nextQuestion()">次へ ❯</button>
-    <button class="secondary" onclick="backToMenu()" style="margin-top:10px; font-size:10px; padding:5px;">中断</button>
+    <input id="capitalAnswer" placeholder="所在地を入力せよ" autocomplete="off">
+    <input id="prefAnswer" class="hidden" placeholder="県名を入力せよ" autocomplete="off">
+    <button id="ansBtn" onclick="app.checkAnswer()">コマンド：答える</button>
+    <button id="nextBtn" class="hidden" style="border-color:var(--gold)" onclick="app.nextQuestion()">▶ 次の敵へ</button>
+    <div style="display:flex;justify-content:space-between;margin-top:10px; font-family:monospace;">
+        <span>HP(正解): <span id="score" style="color:var(--green)">0</span></span>
+        <span>ENEMY: <span id="remaining">0</span></span>
+    </div>
+    <button class="secondary" onclick="backToMenu()" style="margin-top:15px;">リタイア</button>
 </div>
 
 <div class="card hidden" id="finish">
-    <h2>✨ 修行結果 ✨</h2>
-    <h3 id="finalScore"></h3>
-    <div id="wrongList" style="font-size:12px; color:var(--danger); margin-bottom:10px;"></div>
-    <button onclick="restartSameLevel()">もう一度</button>
-    <button class="secondary" onclick="backToMenu()">戻る</button>
+    <h2>QUEST CLEAR!</h2>
+    <h3 id="finalScore" style="color:var(--gold)"></h3>
+    <div id="wrongList" style="font-size:12px; color:var(--red); margin:10px 0; background:#000; padding:5px;"></div>
+    <button onclick="restartSameLevel()">再挑戦</button>
+    <button class="secondary" onclick="backToMenu()">本部へ戻る</button>
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxh7Scgw0wuDzqx7ybubs6UpyHN1uBte9ioTrTcXC4QBJ40jRAvXMavmps5E1K3ANGPUg/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzxFUSzbL0dgkkjwr_IiFAiuLscQPFN70qOyK8OnQQbqm_j2eyXFBurTjK5LBsY-doCxQ/exec"; // ★要貼り替え
+
 const eastJapan=[{name:"北海道",capital:"札幌市",file:"hokkaido.png"},{name:"青森県",capital:"青森市",file:"aomori.png"},{name:"岩手県",capital:"盛岡市",file:"iwate.png"},{name:"宮城県",capital:"仙台市",file:"miyagi.png"},{name:"秋田県",capital:"秋田市",file:"akita.png"},{name:"山形県",capital:"山形市",file:"yamagata.png"},{name:"福島県",capital:"福島市",file:"fukushima.png"},{name:"茨城県",capital:"水戸市",file:"ibaraki.png"},{name:"栃木県",capital:"宇都宮市",file:"tochigi.png"},{name:"群馬県",capital:"前橋市",file:"gunma.png"},{name:"埼玉県",capital:"さいたま市",file:"saitama.png"},{name:"千葉県",capital:"千葉市",file:"chiba.png"},{name:"東京都",capital:"新宿区",file:"tokyo.png"},{name:"神奈川県",capital:"横浜市",file:"kanagawa.png"}];
 const westJapan=[{name:"新潟県",capital:"新潟市",file:"niigata.png"},{name:"富山県",capital:"富山市",file:"toyama.png"},{name:"石川県",capital:"金沢市",file:"ishikawa.png"},{name:"福井県",capital:"福井市",file:"fukui.png"},{name:"山梨県",capital:"甲府市",file:"yamanashi.png"},{name:"長野県",capital:"長野市",file:"nagano.png"},{name:"岐阜県",capital:"岐阜市",file:"gifu.png"},{name:"静岡県",capital:"静岡市",file:"shizuoka.png"},{name:"愛知県",capital:"名古屋市",file:"aichi.png"},{name:"三重県",capital:"津市",file:"mie.png"},{name:"滋賀県",capital:"大津市",file:"shiga.png"},{name:"京都府",capital:"京都市",file:"kyoto.png"},{name:"大阪府",capital:"大阪市",file:"osaka.png"},{name:"兵庫県",capital:"神戸市",file:"hyogo.png"},{name:"奈良県",capital:"奈良市",file:"nara.png"},{name:"和歌山県",capital:"和歌山市",file:"wakayama.png"},{name:"鳥取県",capital:"鳥取市",file:"tottori.png"},{name:"島根県",capital:"松江市",file:"shimane.png"},{name:"岡山県",capital:"岡山市",file:"okayama.png"},{name:"広島県",capital:"広島市",file:"hiroshima.png"},{name:"山口県",capital:"山口市",file:"yamaguchi.png"},{name:"徳島県",capital:"徳島市",file:"tokushima.png"},{name:"香川県",capital:"高松市",file:"kagawa.png"},{name:"愛媛県",capital:"松山市",file:"ehime.png"},{name:"高知県",capital:"高知市",file:"kochi.png"},{name:"福岡県",capital:"福岡市",file:"fukuoka.png"},{name:"佐賀県",capital:"佐賀市",file:"saga.png"},{name:"長崎県",capital:"長崎市",file:"nagasaki.png"},{name:"熊本県",capital:"熊本市",file:"kumamoto.png"},{name:"大分県",capital:"大分市",file:"oita.png"},{name:"宮崎県",capital:"宮崎市",file:"miyazaki.png"},{name:"鹿児島県",capital:"鹿児島市",file:"kagoshima.png"},{name:"沖縄県",capital:"那覇市",file:"okinawa.png"}];
 const allJapan = eastJapan.concat(westJapan);
-let currentList=[], current, score=0, levelMode=1, combo=0, totalQuestions=0, sessionStartTime=Date.now(), gameStartTime=0, sessionWrongPrefs=[];
+
+let currentList=[], current, score=0, levelMode=1, combo=0, totalQuestions=0, sessionStartTime=Date.now(), gameStartTime=0, sessionWrongNames=[];
 
 const app = {
     nextQuestion: function() {
@@ -80,61 +109,94 @@ const app = {
         let index = Math.floor(Math.random()*currentList.length);
         current = currentList.splice(index,1)[0];
         document.getElementById("prefImage").src = current.file;
-        document.getElementById("prefName").textContent = (levelMode<=3 || levelMode==='revive')?current.name:"？は何県？";
-        document.getElementById("capitalAnswer").value=""; document.getElementById("prefAnswer").value="";
+        document.getElementById("prefName").textContent = (levelMode<=3 || levelMode==='revive')?current.name:"？ は何県？";
+        document.getElementById("capitalAnswer").value="";
+        document.getElementById("prefAnswer").value="";
         document.getElementById("result").textContent="";
+        document.getElementById("remaining").textContent = currentList.length;
     },
+
     checkAnswer: function() {
         let cap = document.getElementById("capitalAnswer").value.trim().replace(/[市|区]$/, "");
         let pref = document.getElementById("prefAnswer").value.trim();
         let targetCap = current.capital.replace(/[市|区]$/, "");
         let isCorrect = (levelMode == 6) ? (cap === targetCap && pref === current.name) : (cap === targetCap);
+
         if(isCorrect){
             score++; combo++;
-            document.getElementById("result").textContent = "正解！ ✨"; document.getElementById("result").className = "correct";
-            document.getElementById("comboDisplay").textContent = combo > 1 ? `🔥 ${combo}` : "";
+            document.getElementById("result").textContent = "CRITICAL!!";
+            document.getElementById("result").className = "correct";
+            document.getElementById("comboDisplay").textContent = combo > 1 ? `${combo} COMBO!` : "";
         } else {
-            combo = 0; sessionWrongPrefs.push(current.name);
-            document.getElementById("result").innerHTML = `正解: ${current.capital}`; document.getElementById("result").className = "wrong";
+            combo = 0;
+            sessionWrongNames.push(current.name); // ここで名前を記録
+            document.getElementById("result").textContent = "MISS!!";
+            document.getElementById("result").className = "wrong";
+            document.getElementById("comboDisplay").textContent = "";
         }
-        document.getElementById("ansBtn").classList.add("hidden"); document.getElementById("nextBtn").classList.remove("hidden");
+        document.getElementById("score").textContent = score;
+        document.getElementById("ansBtn").classList.add("hidden");
+        document.getElementById("nextBtn").classList.remove("hidden");
     },
+
     finishGame: async function() {
         const clearTime = Math.floor((Date.now() - gameStartTime) / 1000);
-        document.getElementById("game").classList.add("hidden"); document.getElementById("finish").classList.remove("hidden");
+        document.getElementById("game").classList.add("hidden");
+        document.getElementById("finish").classList.remove("hidden");
         let percent = Math.round((score/totalQuestions)*100);
-        document.getElementById("finalScore").innerHTML = `${score}/${totalQuestions} (${percent}%)<br><small>${clearTime}秒</small>`;
-        document.getElementById("wrongList").textContent = sessionWrongPrefs.length > 0 ? "復習対象: " + sessionWrongPrefs.join(", ") : "完璧です！";
+        document.getElementById("finalScore").innerHTML = `成果: ${score}/${totalQuestions} (${percent}%)<br>TIME: ${clearTime}s`;
+        document.getElementById("wrongList").textContent = sessionWrongNames.length > 0 ? "リベンジ対象: " + sessionWrongNames.join(", ") : "パーフェクト！";
         
-        // 苦手リストをローカルに蓄積
-        let globalWrong = JSON.parse(localStorage.getItem("global_wrong") || "[]");
-        localStorage.setItem("global_wrong", JSON.stringify([...new Set([...globalWrong, ...sessionWrongPrefs])]));
+        // 今日の苦手リストを更新
+        let todayWrong = JSON.parse(localStorage.getItem("today_wrong") || "[]");
+        localStorage.setItem("today_wrong", JSON.stringify([...new Set([...todayWrong, ...sessionWrongNames])]));
 
-        document.getElementById('loading').style.display = 'flex';
-        try { await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({level: levelMode, score: score, percent: percent, time: clearTime, wrongPrefs: sessionWrongPrefs.join(",")}) });
+        // 保存（100%時のみベストタイム）
+        if(percent > (localStorage.getItem("best_p_"+levelMode)||0)) localStorage.setItem("best_p_"+levelMode, percent);
+        if(percent === 100 && clearTime < (localStorage.getItem("best_t_"+levelMode)||9999)) localStorage.setItem("best_t_"+levelMode, clearTime);
+
+        // GAS送信
+        try {
+            const body = JSON.stringify({level: levelMode, score: score, percent: percent, time: clearTime, wrongPrefs: sessionWrongNames.join(",")});
+            await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: body });
         } catch(e) {}
-        document.getElementById('loading').style.display = 'none';
         displayBest(); app.loadStats();
     },
+
     loadStats: async function() {
         try {
             const res = await fetch(GAS_URL); const data = await res.json(); if (data.length === 0) return;
-            const ctx = document.getElementById('scoreChart').getContext('2d');
-            const labels = data.slice(-8).map(d => d.date.split(' ')[0].slice(5));
-            if (window.myChart) window.myChart.destroy();
-            window.myChart = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: '%', data: data.slice(-8).map(d => d.percent), borderColor: '#3498db' }, { label: '秒', data: data.slice(-8).map(d => d.time), borderColor: '#e74c3c' }] }, options: { scales: { y: { min: 0, max: 100 } } } });
+            const labels = data.slice(-7).map(d => d.date.split(' ')[0].slice(5)); // 直近7回分
+            
+            // スコアグラフ
+            if (window.scoreChartObj) window.scoreChartObj.destroy();
+            window.scoreChartObj = new Chart(document.getElementById('scoreChart'), {
+                type: 'line',
+                data: { labels: labels, datasets: [{ label: '正解率(%)', data: data.slice(-7).map(d => d.percent), borderColor: '#3498db', backgroundColor: 'rgba(52,152,219,0.2)', fill: true }] },
+                options: { scales: { y: { min: 0, max: 100, ticks: { color: "#fff" } }, x: { ticks: { color: "#fff" } } }, plugins: { legend: { labels: { color: '#fff', size: 10 } } } }
+            });
+
+            // タイムグラフ
+            if (window.timeChartObj) window.timeChartObj.destroy();
+            window.timeChartObj = new Chart(document.getElementById('timeChart'), {
+                type: 'line',
+                data: { labels: labels, datasets: [{ label: 'タイム(秒)', data: data.slice(-7).map(d => d.time), borderColor: '#e74c3c' }] },
+                options: { scales: { y: { beginAtZero: true, ticks: { color: "#fff" } }, x: { ticks: { color: "#fff" } } }, plugins: { legend: { labels: { color: '#fff' } } } }
+            });
         } catch(e) {}
     }
 };
 
 function startGame(level){
-    levelMode=level; score=0; combo=0; sessionWrongPrefs=[]; gameStartTime = Date.now();
-    document.getElementById("menu").classList.add("hidden"); document.getElementById("game").classList.remove("hidden");
+    levelMode=level; score=0; combo=0; sessionWrongNames=[]; gameStartTime = Date.now();
+    document.getElementById("menu").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+
     if(level==='revive') {
-        let targets = JSON.parse(localStorage.getItem("global_wrong") || "[]");
-        if(targets.length === 0) { alert("まだ苦手な県がありません！"); backToMenu(); return; }
+        let targets = JSON.parse(localStorage.getItem("today_wrong") || "[]");
+        if(targets.length === 0) { alert("今日のミスはありません！完璧です！"); backToMenu(); return; }
         currentList = allJapan.filter(p => targets.includes(p.name));
-        localStorage.setItem("global_wrong", "[]"); // 復習開始時にリセット
+        localStorage.setItem("today_wrong", "[]"); // 復習開始でリセット
     } else {
         if(level==1||level==4) currentList=[...eastJapan]; else if(level==2||level==5) currentList=[...westJapan]; else currentList=[...allJapan];
     }
@@ -142,19 +204,29 @@ function startGame(level){
 }
 
 function displayBest(){
-    let text = "<b>【ベスト記録】</b><br>";
+    let text = "<b>【RECORD】</b><br>";
     for(let i=1;i<=6;i++){
         let p = localStorage.getItem("best_p_"+i) || 0; let t = localStorage.getItem("best_t_"+i) || "-";
-        text += `Lv${i}: ${p}%(${t}s) `; if(i==3) text += "<br>";
+        text += `LV${i}: ${p}% (${t}s) | `;
+        if(i==3) text += "<br>";
     }
     document.getElementById("bestDisplay").innerHTML = text;
 }
-function backToMenu(){ document.querySelectorAll('.card').forEach(c => c.classList.add('hidden')); document.getElementById("menu").classList.remove("hidden"); }
+
+function backToMenu(){
+    document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
+    document.getElementById("menu").classList.remove("hidden");
+    displayBest();
+}
+
 function restartSameLevel(){ startGame(levelMode); }
+
 setInterval(()=>{
     let sec = Math.floor((Date.now()-sessionStartTime)/1000);
-    document.getElementById("playTime").textContent = `今日のプレイ時間：${Math.floor(sec/60)}分 ${sec%60}秒`;
+    let h=String(Math.floor(sec/3600)).padStart(2,'0'), m=String(Math.floor((sec%3600)/60)).padStart(2,'0'), s=String(sec%60).padStart(2,'0');
+    document.getElementById("playTime").textContent = `PLAY TIME: ${h}:${m}:${s}`;
 },1000);
+
 window.onload = () => { displayBest(); app.loadStats(); };
 </script>
 </body>
