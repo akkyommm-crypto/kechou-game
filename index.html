@@ -3,47 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>県庁所在地マスター Pro Sync</title>
+<title>県庁所在地マスター Pro Sync + 復習</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
-:root { --main: #2c3e50; --accent: #3498db; --success: #27ae60; --danger: #e74c3c; --gold: #f1c40f; }
+:root { --main: #2c3e50; --accent: #3498db; --success: #27ae60; --danger: #e74c3c; --revive: #9b59b6; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { margin: 0; font-family: "Hiragino Sans", sans-serif; background: #e0eafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
-
-.card { background: white; width: 100%; max-width: 420px; border-radius: 25px; padding: 25px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 4px solid var(--main); position: relative; overflow: hidden; }
-h2 { color: var(--main); margin: 0 0 15px 0; font-size: 1.4rem; }
-
-button { width: 100%; padding: 12px; margin: 6px 0; font-size: 16px; border: none; border-radius: 15px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0 #2980b9; }
+.card { background: white; width: 100%; max-width: 420px; border-radius: 25px; padding: 20px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 4px solid var(--main); position: relative; }
+h2 { color: var(--main); margin: 0 0 10px 0; font-size: 1.3rem; }
+button { width: 100%; padding: 12px; margin: 5px 0; font-size: 15px; border: none; border-radius: 12px; background: var(--accent); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0 #2980b9; }
 button:active { transform: translateY(2px); box-shadow: none; }
+button.revive { background: var(--revive); box-shadow: 0 4px 0 #8e44ad; }
 button.secondary { background: #95a5a6; box-shadow: 0 4px 0 #7f8c8d; }
-
 input { width: 100%; padding: 12px; font-size: 18px; border-radius: 12px; border: 2px solid #ddd; margin-top: 10px; text-align: center; outline: none; }
-img { width: 100%; max-width: 180px; height: 120px; object-fit: contain; margin: 10px 0; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1)); }
+img { width: 100%; max-width: 160px; height: 110px; object-fit: contain; margin: 10px 0; }
 .hidden { display: none; }
-
-#result { font-size: 22px; font-weight: bold; min-height: 30px; margin: 10px 0; }
-.correct { color: var(--success); animation: bounce 0.4s; }
-.wrong { color: var(--danger); font-size: 16px; }
-@keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
-#comboDisplay { position: absolute; top: 10px; right: 20px; color: var(--danger); font-weight: bold; font-style: italic; }
-#playTime { font-size: 11px; color: #888; }
-#bestDisplay { background: #f8f9fa; padding: 10px; border-radius: 10px; font-size: 11px; text-align: left; margin: 10px 0; line-height: 1.4; border: 1px dashed #ccc; }
-
-.stats-container { margin-top: 15px; padding: 10px; background: #fff; border-radius: 15px; border: 1px solid #eee; }
+#result { font-size: 20px; font-weight: bold; min-height: 28px; margin: 8px 0; }
+.correct { color: var(--success); }
+.wrong { color: var(--danger); font-size: 14px; }
+#comboDisplay { position: absolute; top: 10px; right: 20px; color: var(--danger); font-weight: bold; }
+#bestDisplay { background: #f8f9fa; padding: 8px; border-radius: 10px; font-size: 10px; text-align: left; margin: 10px 0; border: 1px dashed #ccc; line-height: 1.3; }
+.stats-container { margin-top: 10px; padding: 8px; background: #fff; border-radius: 15px; border: 1px solid #eee; }
 #loading { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:1000; justify-content:center; align-items:center; font-weight:bold; }
 </style>
 </head>
-
 <body>
 <div id="loading">通信中...</div>
-
 <div class="card" id="menu">
     <h2>🗺️ 県庁所在地マスター</h2>
-    <div id="playTime">今日のプレイ時間：0時間0分0秒</div>
+    <div id="playTime" style="font-size:11px; color:#888;">今日のプレイ時間：0:0:0</div>
     <div id="bestDisplay"></div>
-    
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 5px;">
         <button onclick="startGame(1)">Lv1 東日本</button>
         <button onclick="startGame(2)">Lv2 西日本</button>
@@ -52,11 +41,8 @@ img { width: 100%; max-width: 180px; height: 120px; object-fit: contain; margin:
         <button onclick="startGame(5)">Lv5 画像(西)</button>
         <button onclick="startGame(6)">LvMAX 究極</button>
     </div>
-
-    <div class="stats-container">
-        <canvas id="scoreChart"></canvas>
-        <button onclick="app.loadStats()" style="font-size:11px; padding:5px; margin-top:5px; height:auto;">📈 グラフを更新</button>
-    </div>
+    <button class="revive" id="reviveBtn" onclick="startGame('revive')">🔥 復習モード (苦手克服)</button>
+    <div class="stats-container"><canvas id="scoreChart"></canvas></div>
 </div>
 
 <div class="card hidden" id="game">
@@ -64,34 +50,27 @@ img { width: 100%; max-width: 180px; height: 120px; object-fit: contain; margin:
     <h2 id="prefName"></h2>
     <img id="prefImage">
     <div id="result"></div>
-    <input id="capitalAnswer" placeholder="県庁所在地を入力" autocomplete="off">
+    <input id="capitalAnswer" placeholder="所在地を入力" autocomplete="off">
     <input id="prefAnswer" class="hidden" placeholder="県名を入力" autocomplete="off">
     <button id="ansBtn" onclick="app.checkAnswer()">答える</button>
-    <button id="nextBtn" class="hidden" onclick="app.nextQuestion()">次の問題 ❯</button>
-    <div style="display:flex;justify-content:space-between;margin-top:10px; font-size: 13px; font-weight: bold;">
-        <span>正解: <span id="score" style="color:var(--success)">0</span></span>
-        <span>残り: <span id="remaining">0</span></span>
-    </div>
-    <button class="secondary" onclick="backToMenu()" style="margin-top:15px; font-size:11px; padding:6px;">中断</button>
+    <button id="nextBtn" class="hidden" onclick="app.nextQuestion()">次へ ❯</button>
+    <button class="secondary" onclick="backToMenu()" style="margin-top:10px; font-size:10px; padding:5px;">中断</button>
 </div>
 
 <div class="card hidden" id="finish">
-    <h2>✨ 修行完了 ✨</h2>
-    <h3 id="finalScore" style="margin:10px 0;"></h3>
-    <h3 id="rank" style="color:var(--accent); font-size:1.6rem; margin:10px 0;"></h3>
-    <button onclick="restartSameLevel()">もう一度挑戦</button>
-    <button class="secondary" onclick="backToMenu()">レベル選択へ</button>
+    <h2>✨ 修行結果 ✨</h2>
+    <h3 id="finalScore"></h3>
+    <div id="wrongList" style="font-size:12px; color:var(--danger); margin-bottom:10px;"></div>
+    <button onclick="restartSameLevel()">もう一度</button>
+    <button class="secondary" onclick="backToMenu()">戻る</button>
 </div>
 
 <script>
-// ★GASのURLをここに貼ってください
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzadjL2_9FR_7gBdm_H9yufywoMGxPmYBLVZVK3LJ96JLXvlHse65EbLgvX6cylDNNdcg/exec";
-
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxh7Scgw0wuDzqx7ybubs6UpyHN1uBte9ioTrTcXC4QBJ40jRAvXMavmps5E1K3ANGPUg/exec";
 const eastJapan=[{name:"北海道",capital:"札幌市",file:"hokkaido.png"},{name:"青森県",capital:"青森市",file:"aomori.png"},{name:"岩手県",capital:"盛岡市",file:"iwate.png"},{name:"宮城県",capital:"仙台市",file:"miyagi.png"},{name:"秋田県",capital:"秋田市",file:"akita.png"},{name:"山形県",capital:"山形市",file:"yamagata.png"},{name:"福島県",capital:"福島市",file:"fukushima.png"},{name:"茨城県",capital:"水戸市",file:"ibaraki.png"},{name:"栃木県",capital:"宇都宮市",file:"tochigi.png"},{name:"群馬県",capital:"前橋市",file:"gunma.png"},{name:"埼玉県",capital:"さいたま市",file:"saitama.png"},{name:"千葉県",capital:"千葉市",file:"chiba.png"},{name:"東京都",capital:"新宿区",file:"tokyo.png"},{name:"神奈川県",capital:"横浜市",file:"kanagawa.png"}];
 const westJapan=[{name:"新潟県",capital:"新潟市",file:"niigata.png"},{name:"富山県",capital:"富山市",file:"toyama.png"},{name:"石川県",capital:"金沢市",file:"ishikawa.png"},{name:"福井県",capital:"福井市",file:"fukui.png"},{name:"山梨県",capital:"甲府市",file:"yamanashi.png"},{name:"長野県",capital:"長野市",file:"nagano.png"},{name:"岐阜県",capital:"岐阜市",file:"gifu.png"},{name:"静岡県",capital:"静岡市",file:"shizuoka.png"},{name:"愛知県",capital:"名古屋市",file:"aichi.png"},{name:"三重県",capital:"津市",file:"mie.png"},{name:"滋賀県",capital:"大津市",file:"shiga.png"},{name:"京都府",capital:"京都市",file:"kyoto.png"},{name:"大阪府",capital:"大阪市",file:"osaka.png"},{name:"兵庫県",capital:"神戸市",file:"hyogo.png"},{name:"奈良県",capital:"奈良市",file:"nara.png"},{name:"和歌山県",capital:"和歌山市",file:"wakayama.png"},{name:"鳥取県",capital:"鳥取市",file:"tottori.png"},{name:"島根県",capital:"松江市",file:"shimane.png"},{name:"岡山県",capital:"岡山市",file:"okayama.png"},{name:"広島県",capital:"広島市",file:"hiroshima.png"},{name:"山口県",capital:"山口市",file:"yamaguchi.png"},{name:"徳島県",capital:"徳島市",file:"tokushima.png"},{name:"香川県",capital:"高松市",file:"kagawa.png"},{name:"愛媛県",capital:"松山市",file:"ehime.png"},{name:"高知県",capital:"高知市",file:"kochi.png"},{name:"福岡県",capital:"福岡市",file:"fukuoka.png"},{name:"佐賀県",capital:"佐賀市",file:"saga.png"},{name:"長崎県",capital:"長崎市",file:"nagasaki.png"},{name:"熊本県",capital:"熊本市",file:"kumamoto.png"},{name:"大分県",capital:"大分市",file:"oita.png"},{name:"宮崎県",capital:"宮崎市",file:"miyazaki.png"},{name:"鹿児島県",capital:"鹿児島市",file:"kagoshima.png"},{name:"沖縄県",capital:"那覇市",file:"okinawa.png"}];
 const allJapan = eastJapan.concat(westJapan);
-
-let currentList=[], current, score=0, levelMode=1, combo=0, totalQuestions=0, sessionStartTime=Date.now(), gameStartTime=0;
+let currentList=[], current, score=0, levelMode=1, combo=0, totalQuestions=0, sessionStartTime=Date.now(), gameStartTime=0, sessionWrongPrefs=[];
 
 const app = {
     nextQuestion: function() {
@@ -101,116 +80,81 @@ const app = {
         let index = Math.floor(Math.random()*currentList.length);
         current = currentList.splice(index,1)[0];
         document.getElementById("prefImage").src = current.file;
-        document.getElementById("prefName").textContent = (levelMode<=3)?current.name:"？は何県？";
-        document.getElementById("capitalAnswer").value="";
-        document.getElementById("prefAnswer").value="";
+        document.getElementById("prefName").textContent = (levelMode<=3 || levelMode==='revive')?current.name:"？は何県？";
+        document.getElementById("capitalAnswer").value=""; document.getElementById("prefAnswer").value="";
         document.getElementById("result").textContent="";
-        document.getElementById("remaining").textContent = currentList.length;
     },
-
     checkAnswer: function() {
         let cap = document.getElementById("capitalAnswer").value.trim().replace(/[市|区]$/, "");
         let pref = document.getElementById("prefAnswer").value.trim();
         let targetCap = current.capital.replace(/[市|区]$/, "");
         let isCorrect = (levelMode == 6) ? (cap === targetCap && pref === current.name) : (cap === targetCap);
-
         if(isCorrect){
             score++; combo++;
-            document.getElementById("result").textContent = "正解！ ✨";
-            document.getElementById("result").className = "correct";
-            document.getElementById("comboDisplay").textContent = combo > 1 ? `🔥 ${combo} Combo!` : "";
+            document.getElementById("result").textContent = "正解！ ✨"; document.getElementById("result").className = "correct";
+            document.getElementById("comboDisplay").textContent = combo > 1 ? `🔥 ${combo}` : "";
         } else {
-            combo = 0;
-            document.getElementById("result").innerHTML = `不正解！ 正解: ${current.name} / ${current.capital}`;
-            document.getElementById("result").className = "wrong";
-            document.getElementById("comboDisplay").textContent = "";
+            combo = 0; sessionWrongPrefs.push(current.name);
+            document.getElementById("result").innerHTML = `正解: ${current.capital}`; document.getElementById("result").className = "wrong";
         }
-        document.getElementById("score").textContent = score;
-        document.getElementById("ansBtn").classList.add("hidden");
-        document.getElementById("nextBtn").classList.remove("hidden");
+        document.getElementById("ansBtn").classList.add("hidden"); document.getElementById("nextBtn").classList.remove("hidden");
     },
-
     finishGame: async function() {
         const clearTime = Math.floor((Date.now() - gameStartTime) / 1000);
-        document.getElementById("game").classList.add("hidden");
-        document.getElementById("finish").classList.remove("hidden");
+        document.getElementById("game").classList.add("hidden"); document.getElementById("finish").classList.remove("hidden");
         let percent = Math.round((score/totalQuestions)*100);
-        document.getElementById("finalScore").innerHTML = `スコア: ${score}/${totalQuestions} (${percent}%)<br><small>タイム: ${clearTime}秒</small>`;
-        document.getElementById("rank").textContent = percent === 100 ? "👑 完全制覇" : percent >= 80 ? "🏆 達人" : "修行中";
+        document.getElementById("finalScore").innerHTML = `${score}/${totalQuestions} (${percent}%)<br><small>${clearTime}秒</small>`;
+        document.getElementById("wrongList").textContent = sessionWrongPrefs.length > 0 ? "復習対象: " + sessionWrongPrefs.join(", ") : "完璧です！";
         
-        // 保存
-        if(percent > (localStorage.getItem("best_p_"+levelMode)||0)) localStorage.setItem("best_p_"+levelMode, percent);
-        if(percent === 100 && clearTime < (localStorage.getItem("best_t_"+levelMode)||9999)) localStorage.setItem("best_t_"+levelMode, clearTime);
+        // 苦手リストをローカルに蓄積
+        let globalWrong = JSON.parse(localStorage.getItem("global_wrong") || "[]");
+        localStorage.setItem("global_wrong", JSON.stringify([...new Set([...globalWrong, ...sessionWrongPrefs])]));
 
-        // GAS送信
         document.getElementById('loading').style.display = 'flex';
-        try {
-            await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({level: levelMode, score: score, percent: percent, time: clearTime}) });
+        try { await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({level: levelMode, score: score, percent: percent, time: clearTime, wrongPrefs: sessionWrongPrefs.join(",")}) });
         } catch(e) {}
         document.getElementById('loading').style.display = 'none';
-        displayBest();
+        displayBest(); app.loadStats();
     },
-
     loadStats: async function() {
         try {
-            const res = await fetch(GAS_URL);
-            const data = await res.json();
-            if (data.length === 0) return;
+            const res = await fetch(GAS_URL); const data = await res.json(); if (data.length === 0) return;
             const ctx = document.getElementById('scoreChart').getContext('2d');
-            const labels = data.slice(-10).map(d => d.date.split(' ')[0].slice(5));
-            const scores = data.slice(-10).map(d => d.percent);
-            const times = data.slice(-10).map(d => d.time);
+            const labels = data.slice(-8).map(d => d.date.split(' ')[0].slice(5));
             if (window.myChart) window.myChart.destroy();
-            window.myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{ label: '%', data: scores, borderColor: '#3498db', yAxisID: 'y' }, { label: '秒', data: times, borderColor: '#e74c3c', yAxisID: 'y1' }]
-                },
-                options: { scales: { y: { min: 0, max: 100 }, y1: { position: 'right', grid: { drawOnChartArea: false } } } }
-            });
-        } catch(e) { alert("データ取得失敗"); }
+            window.myChart = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: '%', data: data.slice(-8).map(d => d.percent), borderColor: '#3498db' }, { label: '秒', data: data.slice(-8).map(d => d.time), borderColor: '#e74c3c' }] }, options: { scales: { y: { min: 0, max: 100 } } } });
+        } catch(e) {}
     }
 };
 
 function startGame(level){
-    levelMode=level; score=0; combo=0; gameStartTime = Date.now();
-    document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-    document.getElementById("game").classList.remove("hidden");
-    if(level==1||level==4) currentList=[...eastJapan];
-    else if(level==2||level==5) currentList=[...westJapan];
-    else currentList=[...allJapan];
-    totalQuestions = currentList.length;
-    document.getElementById("prefAnswer").classList.toggle("hidden", level!=6);
-    document.getElementById("score").textContent = "0";
-    app.nextQuestion();
+    levelMode=level; score=0; combo=0; sessionWrongPrefs=[]; gameStartTime = Date.now();
+    document.getElementById("menu").classList.add("hidden"); document.getElementById("game").classList.remove("hidden");
+    if(level==='revive') {
+        let targets = JSON.parse(localStorage.getItem("global_wrong") || "[]");
+        if(targets.length === 0) { alert("まだ苦手な県がありません！"); backToMenu(); return; }
+        currentList = allJapan.filter(p => targets.includes(p.name));
+        localStorage.setItem("global_wrong", "[]"); // 復習開始時にリセット
+    } else {
+        if(level==1||level==4) currentList=[...eastJapan]; else if(level==2||level==5) currentList=[...westJapan]; else currentList=[...allJapan];
+    }
+    totalQuestions = currentList.length; app.nextQuestion();
 }
 
 function displayBest(){
     let text = "<b>【ベスト記録】</b><br>";
     for(let i=1;i<=6;i++){
-        let p = localStorage.getItem("best_p_"+i) || 0;
-        let t = localStorage.getItem("best_t_"+i) || "-";
-        text += `Lv${i}: ${p}% (${t}s) `;
-        if(i==3) text += "<br>";
+        let p = localStorage.getItem("best_p_"+i) || 0; let t = localStorage.getItem("best_t_"+i) || "-";
+        text += `Lv${i}: ${p}%(${t}s) `; if(i==3) text += "<br>";
     }
     document.getElementById("bestDisplay").innerHTML = text;
 }
-
-function backToMenu(){
-    document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-    document.getElementById("menu").classList.remove("hidden");
-    displayBest();
-}
-
+function backToMenu(){ document.querySelectorAll('.card').forEach(c => c.classList.add('hidden')); document.getElementById("menu").classList.remove("hidden"); }
 function restartSameLevel(){ startGame(levelMode); }
-
 setInterval(()=>{
     let sec = Math.floor((Date.now()-sessionStartTime)/1000);
-    let h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60), s=sec%60;
-    document.getElementById("playTime").textContent = `今日のプレイ時間：${h}時間 ${m}分 ${s}秒`;
+    document.getElementById("playTime").textContent = `今日のプレイ時間：${Math.floor(sec/60)}分 ${sec%60}秒`;
 },1000);
-
 window.onload = () => { displayBest(); app.loadStats(); };
 </script>
 </body>
