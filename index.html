@@ -192,25 +192,47 @@ async function renderCharts() {
         const res = await fetch(GAS_URL); const data = await res.json(); if (data.length === 0) return;
         const lastData = data.slice(-10);
         const labels = lastData.map(d => d.date.split(' ')[0].slice(5));
+        
         const chartOptions = { 
             scales: { 
                 y: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } }, 
                 x: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } } 
             },
-            plugins: { legend: { labels: { color: "#fff", font: { size: 12 } } } }
+            plugins: { legend: { labels: { color: "#fff", font: { size: 12 } } } },
+            elements: {
+                line: { tension: 0 } // ★ここを0にすることで直線の折れ線になります
+            }
         };
 
         if (window.scChart) window.scChart.destroy();
         window.scChart = new Chart(document.getElementById('scoreChart'), {
             type: 'line',
-            data: { labels: labels, datasets: [{ label: '正解率(%)', data: lastData.map(d => d.percent), borderColor: '#00d9ff', backgroundColor: 'rgba(0,217,255,0.1)', fill: true, tension: 0.3 }] },
+            data: { 
+                labels: labels, 
+                datasets: [{ 
+                    label: '正解率(%)', 
+                    data: lastData.map(d => d.percent), 
+                    borderColor: '#00d9ff', 
+                    backgroundColor: 'rgba(0,217,255,0.1)', 
+                    fill: true,
+                    pointRadius: 4 // 点を見やすく
+                }] 
+            },
             options: chartOptions
         });
 
         if (window.tmChart) window.tmChart.destroy();
         window.tmChart = new Chart(document.getElementById('timeChart'), {
             type: 'line',
-            data: { labels: labels, datasets: [{ label: 'タイム(秒)', data: lastData.map(d => d.time), borderColor: '#ff3b3b', tension: 0.3 }] },
+            data: { 
+                labels: labels, 
+                datasets: [{ 
+                    label: 'タイム(秒)', 
+                    data: lastData.map(d => d.time), 
+                    borderColor: '#ff3b3b',
+                    pointRadius: 4
+                }] 
+            },
             options: chartOptions
         });
     } catch(e) { console.error(e); }
