@@ -3,242 +3,1279 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PREF_MASTER: THE QUEST Ver1.2</title>
+<title>PREF_MASTER: THE QUEST Ver2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-:root { --bg: #05080a; --panel: #12181f; --text: #f0f0f0; --gold: #ffcc00; --red: #ff3b3b; --blue: #00d9ff; --green: #00ff66; --border: #333; --overlay: rgba(5, 8, 10, 0.95); }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Consolas', 'Courier New', sans-serif; }
-body { margin: 0; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 10px; }
-.card { background: var(--panel); width: 100%; max-width: 400px; border-radius: 4px; padding: 20px; border: 2px solid var(--border); box-shadow: 0 0 30px rgba(0,0,0,0.8); position: relative; }
-h2 { color: var(--gold); text-align: center; margin: 0 0 15px 0; font-size: 1.2rem; letter-spacing: 4px; border-bottom: 1px solid var(--gold); padding-bottom: 10px; }
-.status-bar { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 8px; color: #666; font-weight: bold; }
-#bestDisplay { font-size: 10px; color: var(--gold); background: #000; padding: 10px; margin-bottom: 15px; border-left: 3px solid var(--gold); line-height: 1.6; }
-button { width: 100%; padding: 14px; margin: 5px 0; font-size: 14px; border: 1px solid var(--blue); border-radius: 2px; background: #111; color: var(--blue); font-weight: bold; cursor: pointer; text-transform: uppercase; }
-button:active { background: var(--blue); color: #000; }
-button.revive { border-color: var(--red); color: var(--red); background: #200; }
-button.stats-btn { border-color: var(--green); color: var(--green); }
-button.secondary { border-color: #444; color: #777; font-size: 10px; padding: 8px; margin-top: 10px; }
-.battle-zone { background: #000; border: 1px solid #222; padding: 15px; margin: 15px 0; min-height: 240px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-#prefName { font-size: 2rem; color: #fff; text-shadow: 0 0 15px var(--blue); margin-bottom: 15px; }
-#prefImage { width: 180px; height: 120px; object-fit: contain; background: #fff; border: 3px solid var(--gold); margin-bottom: 15px; }
-input { width: 100%; padding: 15px; font-size: 1.3rem; border: none; border-bottom: 2px solid var(--gold); background: transparent; color: var(--green); text-align: center; margin-bottom: 10px; outline: none; }
-#result { height: 35px; font-weight: bold; font-size: 1.2rem; text-align: center; margin-bottom: 5px; }
-.correct { color: var(--green); text-shadow: 0 0 10px var(--green); }
-.wrong { color: var(--red); text-shadow: 0 0 10px var(--red); }
-#statsOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-.stats-content { width: 100%; max-width: 400px; background: #111; border: 1px solid var(--green); padding: 15px; position: relative; }
-.close-btn { position: absolute; top: -40px; right: 0; color: #fff; font-size: 16px; border: 1px solid #fff; padding: 5px 15px; cursor: pointer; }
-.range-btns { display: flex; gap: 5px; margin-bottom: 10px; }
-.range-btns button { flex: 1; margin: 0; font-size: 12px; padding: 8px; border-width: 1px; }
-.hidden { display: none; }
+/* ===== DESIGN SYSTEM ===== */
+:root {
+  --bg: #0a0e1a;
+  --panel: #111827;
+  --panel2: #1a2235;
+  --text: #e8eaf6;
+  --gold: #ffd700;
+  --gold2: #ffaa00;
+  --red: #ff4757;
+  --blue: #4fc3f7;
+  --blue2: #0288d1;
+  --green: #69f0ae;
+  --purple: #ce93d8;
+  --cyan: #00e5ff;
+  --border: #1e3a5f;
+  --combo: #ff6b35;
+  --exp: #a5d6a7;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
+body {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 10px;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(0,100,200,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(100,0,200,0.06) 0%, transparent 50%);
+}
+
+.screen { width: 100%; max-width: 420px; display: none; }
+.screen.active { display: block; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+  margin-bottom: 12px;
+}
+
+/* ===== TITLE ===== */
+.game-title {
+  font-family: 'Zen Dots', monospace;
+  font-size: 1.4rem;
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(255,215,0,0.5);
+  margin-bottom: 4px;
+}
+.game-subtitle { font-size: 10px; color: #555; text-align: center; letter-spacing: 3px; margin-bottom: 16px; }
+
+/* ===== PLAYER CARD ===== */
+.player-card {
+  background: linear-gradient(135deg, #0d1b2a, #1a2744);
+  border: 1px solid #1e3a6e;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.player-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, rgba(79,195,247,0.15), transparent 70%);
+}
+.player-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.char-avatar {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--blue2), var(--purple));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  border: 2px solid var(--blue);
+  box-shadow: 0 0 15px rgba(79,195,247,0.3);
+}
+.player-info { flex: 1; min-width: 0; }
+.player-name { font-size: 13px; font-weight: 900; color: var(--blue); }
+.player-title { font-size: 10px; color: var(--gold); margin: 2px 0; }
+.char-name { font-size: 11px; color: #aaa; }
+
+/* EXP BAR */
+.exp-section { margin-top: 8px; }
+.exp-label { display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 4px; }
+.exp-bar { height: 6px; background: #1a2235; border-radius: 3px; overflow: hidden; }
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--cyan));
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* POINT DISPLAY */
+.point-row { display: flex; gap: 8px; margin-top: 10px; }
+.point-box {
+  flex: 1;
+  background: #0a1628;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+.point-box .label { font-size: 9px; color: #666; margin-bottom: 2px; letter-spacing: 1px; }
+.point-box .value { font-family: 'Zen Dots', monospace; font-size: 1.1rem; color: var(--gold); }
+.point-box.available .value { color: var(--green); }
+.point-box .unit { font-size: 9px; color: #888; }
+
+/* ===== LEVEL GRID ===== */
+.level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.level-btn {
+  background: linear-gradient(135deg, #0f1c2e, #1a2744);
+  border: 1px solid #1e3a5f;
+  border-radius: 10px;
+  padding: 12px 8px;
+  color: var(--blue);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.level-btn:active { transform: scale(0.96); }
+.level-btn .lv-badge {
+  font-family: 'Zen Dots', monospace;
+  font-size: 9px;
+  color: #555;
+  display: block;
+  margin-bottom: 4px;
+}
+.level-btn .lv-name { display: block; }
+.level-btn .lv-pts {
+  font-size: 9px;
+  color: var(--gold);
+  display: block;
+  margin-top: 4px;
+}
+.level-btn.ultimate { 
+  background: linear-gradient(135deg, #1a0a2e, #2a1a44); 
+  border-color: var(--gold);
+  color: var(--gold);
+  grid-column: 1 / -1;
+}
+.level-btn.revive-btn {
+  background: linear-gradient(135deg, #1a0a0a, #2a1414);
+  border-color: var(--red);
+  color: var(--red);
+  grid-column: 1 / -1;
+}
+
+/* ACTION BTNS */
+.action-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.15s;
+}
+.action-btn:active { transform: scale(0.97); }
+.btn-stats { background: linear-gradient(135deg, #1a2e1a, #1a3a1a); color: var(--green); border: 1px solid var(--green); }
+.btn-exchange { background: linear-gradient(135deg, #2e1a00, #3a2a00); color: var(--gold); border: 1px solid var(--gold); }
+
+/* ===== GAME SCREEN ===== */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #1e3a5f;
+}
+.game-header .level-tag {
+  font-family: 'Zen Dots', monospace;
+  font-size: 10px;
+  color: var(--blue);
+  background: rgba(79,195,247,0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(79,195,247,0.3);
+}
+.remain-tag { font-size: 11px; color: #666; }
+
+/* COMBO DISPLAY */
+.combo-area {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  position: relative;
+}
+.combo-badge {
+  font-family: 'Zen Dots', monospace;
+  font-size: 1.5rem;
+  color: var(--combo);
+  text-shadow: 0 0 20px var(--combo);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: absolute;
+}
+.combo-badge.show { opacity: 1; transform: scale(1); }
+.combo-badge.mega { font-size: 2rem; color: var(--gold); text-shadow: 0 0 30px var(--gold); animation: pulse 0.5s ease infinite alternate; }
+
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)} }
+@keyframes popIn { 0%{transform:scale(0) rotate(-10deg);opacity:0} 70%{transform:scale(1.2) rotate(3deg);opacity:1} 100%{transform:scale(1) rotate(0);opacity:1} }
+@keyframes floatUp { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(-40px);opacity:0} }
+
+/* BATTLE ZONE */
+.battle-zone {
+  background: linear-gradient(180deg, #050d1a, #0a1628);
+  border: 1px solid #1e3a5f;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 12px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.battle-zone::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+  animation: scan 2s linear infinite;
+}
+@keyframes scan { 0%{opacity:0.3} 50%{opacity:1} 100%{opacity:0.3} }
+
+#prefName {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(79,195,247,0.4);
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+#prefImage {
+  width: 160px; height: 110px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 20px rgba(255,215,0,0.2);
+  margin-bottom: 12px;
+}
+#result {
+  font-size: 1.1rem;
+  font-weight: 900;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.correct { color: var(--green); }
+.wrong { color: var(--red); animation: shake 0.3s ease; }
+
+/* INPUT */
+.input-wrap { position: relative; margin-bottom: 10px; }
+.input-wrap input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1.2rem;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-weight: 700;
+  background: #050d1a;
+  border: 2px solid #1e3a5f;
+  border-radius: 10px;
+  color: var(--green);
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(79,195,247,0.1); }
+.input-wrap input.hidden { display: none; }
+
+/* GAME BUTTONS */
+.btn-attack {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #0a4a7a, #0d6ebd);
+  color: #fff;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(13,110,189,0.4);
+  transition: all 0.15s;
+}
+.btn-attack:active { transform: scale(0.97); box-shadow: none; }
+.btn-next {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #0a3a1a, #0d6e3a);
+  color: var(--green);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.15s;
+  display: none;
+}
+.btn-next:active { transform: scale(0.97); }
+
+/* SCORE BAR */
+.score-bar { display: flex; justify-content: space-between; align-items: center; }
+.score-display { font-family: 'Zen Dots', monospace; font-size: 11px; color: var(--gold); }
+.btn-retire { background: none; border: 1px solid #333; color: #555; font-size: 10px; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-family: 'M PLUS Rounded 1c', sans-serif; }
+
+/* FLOAT SCORE */
+.float-score {
+  position: absolute;
+  font-family: 'Zen Dots', monospace;
+  font-size: 1rem;
+  pointer-events: none;
+  animation: floatUp 1s ease forwards;
+  z-index: 100;
+}
+
+/* ===== FINISH SCREEN ===== */
+.finish-hero {
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #0d1b2a, #1a2744);
+  border-radius: 12px;
+  margin-bottom: 14px;
+  border: 1px solid #1e3a5f;
+  position: relative;
+  overflow: hidden;
+}
+.finish-hero::after {
+  content: '★';
+  position: absolute;
+  font-size: 8rem;
+  color: rgba(255,215,0,0.03);
+  right: -10px; bottom: -20px;
+}
+.finish-percent {
+  font-family: 'Zen Dots', monospace;
+  font-size: 3rem;
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(255,215,0,0.5);
+  line-height: 1;
+}
+.finish-label { font-size: 10px; color: #888; letter-spacing: 2px; margin-top: 4px; margin-bottom: 12px; }
+
+/* REWARDS */
+.rewards-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 14px 0; }
+.reward-box {
+  background: #050d1a;
+  border: 1px solid #1e3a5f;
+  border-radius: 8px;
+  padding: 10px 6px;
+  text-align: center;
+}
+.reward-box .r-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+.reward-box .r-label { font-size: 9px; color: #666; display: block; }
+.reward-box .r-value { font-family: 'Zen Dots', monospace; font-size: 0.95rem; color: var(--gold); display: block; }
+.reward-box.highlight { border-color: var(--gold); background: rgba(255,215,0,0.05); }
+
+.wrong-list {
+  font-size: 11px;
+  color: var(--red);
+  padding: 10px 12px;
+  background: rgba(255,71,87,0.05);
+  border: 1px solid rgba(255,71,87,0.2);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  line-height: 1.8;
+}
+.wrong-list.all-clear { color: var(--green); border-color: rgba(105,240,174,0.3); background: rgba(105,240,174,0.05); }
+
+.btn-retry {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #0a4a7a, #0d6ebd);
+  color: #fff;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 15px rgba(13,110,189,0.4);
+}
+.btn-back { width: 100%; padding: 10px; background: #111; border: 1px solid #333; border-radius: 8px; color: #888; font-size: 12px; font-family: 'M PLUS Rounded 1c', sans-serif; cursor: pointer; }
+
+/* ===== LEVEL UP OVERLAY ===== */
+#levelUpOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#levelUpOverlay.show { display: flex; }
+.levelup-card {
+  background: linear-gradient(135deg, #1a0d3a, #2a1a5a);
+  border: 2px solid var(--purple);
+  border-radius: 20px;
+  padding: 32px 40px;
+  text-align: center;
+  animation: popIn 0.5s ease;
+  box-shadow: 0 0 60px rgba(206,147,216,0.4);
+}
+.levelup-title { font-family: 'Zen Dots', monospace; font-size: 1.1rem; color: var(--purple); letter-spacing: 3px; margin-bottom: 8px; }
+.levelup-lv { font-family: 'Zen Dots', monospace; font-size: 3rem; color: var(--gold); text-shadow: 0 0 30px var(--gold); }
+.levelup-name { font-size: 1.1rem; font-weight: 700; color: #fff; margin-top: 8px; }
+.levelup-close { margin-top: 20px; padding: 10px 30px; background: var(--purple); border: none; border-radius: 8px; color: #fff; font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+
+/* ===== EXCHANGE OVERLAY ===== */
+#exchangeOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 1500;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#exchangeOverlay.show { display: flex; }
+.exchange-card {
+  background: #111827;
+  border: 1px solid var(--gold);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 360px;
+  padding: 24px;
+  position: relative;
+}
+.exchange-title { font-family: 'Zen Dots', monospace; font-size: 1rem; color: var(--gold); margin-bottom: 4px; }
+.exchange-pts { font-size: 11px; color: var(--green); margin-bottom: 16px; }
+.exchange-items { display: grid; gap: 8px; }
+.exchange-item {
+  background: #050d1a;
+  border: 1px solid #1e3a5f;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.exchange-item:active { background: #0a1628; border-color: var(--gold); }
+.exchange-item .ex-info {}
+.exchange-item .ex-name { font-size: 13px; font-weight: 700; color: #fff; }
+.exchange-item .ex-desc { font-size: 10px; color: #888; margin-top: 2px; }
+.exchange-item .ex-cost { font-family: 'Zen Dots', monospace; font-size: 1rem; color: var(--gold); white-space: nowrap; }
+.exchange-item .ex-unit { font-size: 9px; color: #888; }
+.exchange-close { width: 100%; margin-top: 12px; padding: 10px; background: #222; border: 1px solid #444; border-radius: 8px; color: #888; font-family: 'M PLUS Rounded 1c', sans-serif; cursor: pointer; }
+
+/* ===== STATS OVERLAY ===== */
+#statsOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 1500;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  overflow-y: auto;
+}
+#statsOverlay.show { display: flex; }
+.stats-card {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  background: #111827;
+  border: 1px solid var(--green);
+  border-radius: 16px;
+  padding: 20px;
+}
+.stats-title { font-family: 'Zen Dots', monospace; font-size: 11px; color: var(--green); margin-bottom: 12px; letter-spacing: 2px; }
+.range-btns { display: flex; gap: 6px; margin-bottom: 14px; }
+.range-btn { flex: 1; padding: 8px; background: #050d1a; border: 1px solid #1e3a5f; border-radius: 6px; color: #888; font-size: 11px; font-family: 'M PLUS Rounded 1c', sans-serif; cursor: pointer; }
+.range-btn.active { background: rgba(105,240,174,0.1); border-color: var(--green); color: var(--green); }
+.stats-close { width: 100%; margin-top: 12px; padding: 10px; background: #222; border: 1px solid #444; border-radius: 8px; color: #888; font-family: 'M PLUS Rounded 1c', sans-serif; cursor: pointer; }
+.chart-label { font-size: 10px; color: #666; margin-bottom: 6px; margin-top: 14px; }
+
+/* ===== NOTIFICATION TOAST ===== */
+#toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: linear-gradient(135deg, #1a2744, #0d2244);
+  border: 1px solid var(--blue);
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 12px;
+  color: var(--blue);
+  z-index: 3000;
+  transition: transform 0.3s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ===== BEST RECORDS ===== */
+.best-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.best-chip {
+  background: #050d1a;
+  border: 1px solid #1e3a5f;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-family: 'Zen Dots', monospace;
+  font-size: 9px;
+  color: #888;
+}
+.best-chip.gold { border-color: rgba(255,215,0,0.4); color: var(--gold); }
+
+/* TIMER */
+.session-timer { font-family: 'Zen Dots', monospace; font-size: 9px; color: #444; text-align: right; margin-bottom: 8px; }
 </style>
 </head>
 <body>
 
-<div class="card" id="menu">
-    <div class="status-bar"><span>SYSTEM: ONLINE</span><span id="playTime">00:00</span></div>
-    <h2>PREF_MASTER: QUEST</h2>
-    <div id="bestDisplay"></div>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <button onclick="startGame(1)">LV.1 東日本</button>
-        <button onclick="startGame(2)">LV.2 西日本</button>
-        <button onclick="startGame(3)">LV.3 全国版</button>
-        <button onclick="startGame(4)">LV.4 視覚:東</button>
-        <button onclick="startGame(5)">LV.5 視覚:西</button>
-        <button onclick="startGame(6)">LV.MAX 究極</button>
-    </div>
-    <button class="revive" onclick="startGame('revive')">⚡ リベンジ（今日のミス）</button>
-    <button class="stats-btn" onclick="openStats()">📊 過去の戦績データ</button>
-</div>
+<!-- ===== MENU SCREEN ===== -->
+<div class="screen active" id="menuScreen">
+  <div class="session-timer" id="playTime">00:00</div>
 
-<div class="card hidden" id="game">
-    <div class="status-bar"><span>STATUS: IN BATTLE</span><span>REMAIN: <span id="remaining">0</span></span></div>
-    <div class="battle-zone">
-        <div id="prefName"></div>
-        <img id="prefImage">
-        <div id="result"></div>
-    </div>
-    <input id="capitalAnswer" placeholder="所在地名を入力せよ" autocomplete="off">
-    <input id="prefAnswer" class="hidden" placeholder="県名を名乗れ" autocomplete="off">
-    <button id="ansBtn" onclick="app.checkAnswer()">コマンド：攻撃</button>
-    <button id="nextBtn" class="hidden" style="border-color:var(--green); color:var(--green);" onclick="app.nextQuestion()">▶ 次の敵へ</button>
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="color:var(--green); font-size:12px;">SCORE: <span id="score">0</span></span>
-        <button class="secondary" onclick="backToMenu()" style="width:auto;">リタイア</button>
-    </div>
-</div>
+  <div class="card">
+    <div class="game-title">PREF_MASTER</div>
+    <div class="game-subtitle">THE QUEST Ver 2.0</div>
 
-<div class="card hidden" id="finish">
-    <h2>QUEST COMPLETE</h2>
-    <div style="text-align:center; padding:20px; border:1px solid var(--gold); margin-bottom:15px; background: #000;">
-        <div id="finalScore" style="font-size:1.6rem; color:var(--gold);"></div>
-        <div id="finalTime" style="font-size:0.9rem; color:#888; margin-top:10px;"></div>
-    </div>
-    <div id="wrongList" style="font-size:11px; color:var(--red); margin-bottom:15px; padding:10px; background:#000; border:1px solid #222;"></div>
-    <button onclick="restartSameLevel()">再挑戦（RETRY）</button>
-    <button class="secondary" onclick="backToMenu()">本部へ戻る</button>
-</div>
-
-<div id="statsOverlay">
-    <div class="stats-content">
-        <div class="close-btn" onclick="closeStats()">× CLOSE</div>
-        <h3 style="color:var(--green); font-size:12px; margin:0 0 10px 0;">DATA ANALYZE</h3>
-        <div class="range-btns">
-            <button onclick="updateRange('day')" style="border-color:var(--blue); color:var(--blue);">日次</button>
-            <button onclick="updateRange('month')" style="border-color:var(--gold); color:var(--gold);">月次</button>
-            <button onclick="updateRange('all')" style="border-color:var(--green); color:var(--green);">全期間</button>
+    <!-- Player Card -->
+    <div class="player-card" id="playerCard">
+      <div class="player-header">
+        <div class="char-avatar" id="charAvatar" style="font-size:1rem; font-family:'M PLUS Rounded 1c',sans-serif; font-weight:900; color:#fff; letter-spacing:0;">Lv.1</div>
+        <div class="player-info">
+          <div class="player-name" id="playerNameDisplay">PLAYER</div>
+          <div class="player-title" id="playerTitleDisplay">🌱 ルーキー</div>
+          <div class="char-name" id="charNameDisplay">見習い探検家 Lv.1</div>
         </div>
-        <canvas id="scoreChart" style="margin-bottom:20px;"></canvas>
-        <canvas id="timeChart"></canvas>
+      </div>
+      <div class="exp-section">
+        <div class="exp-label">
+          <span>EXP</span>
+          <span id="expLabel">0 / 100</span>
+        </div>
+        <div class="exp-bar"><div class="exp-fill" id="expFill" style="width:0%"></div></div>
+      </div>
+      <div class="point-row">
+        <div class="point-box">
+          <div class="label">TOTAL PTS</div>
+          <div class="value" id="totalPtsDisplay">0</div>
+          <div class="unit">points</div>
+        </div>
+        <div class="point-box available">
+          <div class="label">USE可能</div>
+          <div class="value" id="availPtsDisplay">0</div>
+          <div class="unit">points</div>
+        </div>
+        <div class="point-box">
+          <div class="label">MAX COMBO</div>
+          <div class="value" id="maxComboDisplay">0</div>
+          <div class="unit">chain</div>
+        </div>
+      </div>
     </div>
+
+    <!-- Best Records -->
+    <div style="margin-bottom:12px;">
+      <div style="font-size:9px;color:#555;letter-spacing:2px;margin-bottom:6px;">BEST RECORDS</div>
+      <div class="best-row" id="bestRow"></div>
+    </div>
+
+    <!-- Level Buttons -->
+    <div class="level-grid">
+      <button class="level-btn" onclick="startGame(1)">
+        <span class="lv-badge">LV.1</span>
+        <span class="lv-name">東日本</span>
+        <span class="lv-pts">全問正解で +1 pt</span>
+      </button>
+      <button class="level-btn" onclick="startGame(2)">
+        <span class="lv-badge">LV.2</span>
+        <span class="lv-name">西日本</span>
+        <span class="lv-pts">全問正解で +2 pt</span>
+      </button>
+      <button class="level-btn" onclick="startGame(3)">
+        <span class="lv-badge">LV.3</span>
+        <span class="lv-name">全国版</span>
+        <span class="lv-pts">全問正解で +3 pt</span>
+      </button>
+      <button class="level-btn" onclick="startGame(4)">
+        <span class="lv-badge">LV.4</span>
+        <span class="lv-name">視覚：東</span>
+        <span class="lv-pts">全問正解で +4 pt</span>
+      </button>
+      <button class="level-btn" onclick="startGame(5)">
+        <span class="lv-badge">LV.5</span>
+        <span class="lv-name">視覚：西</span>
+        <span class="lv-pts">全問正解で +5 pt</span>
+      </button>
+      <button class="level-btn ultimate" onclick="startGame(6)">
+        <span class="lv-badge">LV.MAX</span>
+        <span class="lv-name">⚡ 究極モード</span>
+        <span class="lv-pts">全問正解で +10 pt</span>
+      </button>
+      <button class="level-btn revive-btn" onclick="startGame('revive')">
+        <span class="lv-badge">SPECIAL</span>
+        <span class="lv-name">🔁 リベンジ（今日のミス）</span>
+        <span class="lv-pts">雪辱を果たせ</span>
+      </button>
+    </div>
+
+    <button class="action-btn btn-stats" onclick="openStats()">📊 過去の戦績データ</button>
+    <button class="action-btn btn-exchange" onclick="openExchange()">🎁 ポイント → お小遣い交換</button>
+  </div>
 </div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div class="screen" id="gameScreen">
+  <div class="card">
+    <div class="game-header">
+      <span class="level-tag" id="gameLevelTag">LV.1</span>
+      <span class="remain-tag">残り <span id="remaining">0</span> 問</span>
+    </div>
+
+    <!-- Combo -->
+    <div class="combo-area">
+      <div class="combo-badge" id="comboBadge"></div>
+    </div>
+
+    <!-- Battle Zone -->
+    <div class="battle-zone" id="battleZone">
+      <div id="prefName"></div>
+      <img id="prefImage" style="display:none;">
+      <div id="result"></div>
+    </div>
+
+    <!-- Input -->
+    <div class="input-wrap">
+      <input id="capitalAnswer" placeholder="所在地名を入力せよ" autocomplete="off">
+      <input id="prefAnswer" class="hidden" placeholder="県名を名乗れ" autocomplete="off">
+    </div>
+
+    <button class="btn-attack" id="ansBtn" onclick="checkAnswer()">⚔️ 攻撃！</button>
+    <button class="btn-next" id="nextBtn" onclick="nextQuestion()">▶ 次の敵へ</button>
+
+    <div class="score-bar">
+      <div class="score-display">SCORE: <span id="score">0</span> / <span id="totalQ">0</span> ｜ ミス: <span id="missCount">0</span>問</div>
+      <button class="btn-retire" onclick="backToMenu()">リタイア</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FINISH SCREEN ===== -->
+<div class="screen" id="finishScreen">
+  <div class="card">
+    <div class="finish-hero">
+      <div class="finish-percent" id="finishPercent">0%</div>
+      <div class="finish-label">QUEST COMPLETE</div>
+      <div id="finishTime" style="font-size:11px;color:#888;"></div>
+    </div>
+
+    <div class="rewards-grid" id="rewardsGrid">
+      <div class="reward-box">
+        <span class="r-icon">⭐</span>
+        <span class="r-label">POINTS</span>
+        <span class="r-value" id="r-pts">0</span>
+      </div>
+      <div class="reward-box">
+        <span class="r-icon">📈</span>
+        <span class="r-label">EXP</span>
+        <span class="r-value" id="r-exp">0</span>
+      </div>
+      <div class="reward-box">
+        <span class="r-icon">🔥</span>
+        <span class="r-label">MAX COMBO</span>
+        <span class="r-value" id="r-combo">0</span>
+      </div>
+    </div>
+
+    <div class="wrong-list" id="wrongList"></div>
+
+    <button class="btn-retry" onclick="restartSameLevel()">🔄 再挑戦（RETRY）</button>
+    <button class="btn-back" onclick="backToMenu()">本部へ戻る</button>
+  </div>
+</div>
+
+<!-- ===== OVERLAYS ===== -->
+
+<!-- Level Up -->
+<div id="levelUpOverlay">
+  <div class="levelup-card">
+    <div class="levelup-title">LEVEL UP !</div>
+    <div class="levelup-lv" id="levelUpLv">Lv.2</div>
+    <div class="levelup-name" id="levelUpName">旅人</div>
+    <button class="levelup-close" onclick="closeLevelUp()">やったー！</button>
+  </div>
+</div>
+
+<!-- Exchange -->
+<div id="exchangeOverlay">
+  <div class="exchange-card">
+    <div class="exchange-title">🎁 ポイント交換所</div>
+    <div class="exchange-pts">使えるポイント: <span id="exchAvailPts" style="color:var(--gold);font-weight:700;">0</span> pts</div>
+    <div class="exchange-items">
+      <div class="exchange-item" onclick="doExchange(50,'10円おこづかい')">
+        <div class="ex-info">
+          <div class="ex-name">💴 10円おこづかい</div>
+          <div class="ex-desc">がんばった分だけもらおう</div>
+        </div>
+        <div><div class="ex-cost">50</div><div class="ex-unit">pts</div></div>
+      </div>
+      <div class="exchange-item" onclick="doExchange(200,'50円おこづかい')">
+        <div class="ex-info">
+          <div class="ex-name">💰 50円おこづかい</div>
+          <div class="ex-desc">コツコツためるとお得！</div>
+        </div>
+        <div><div class="ex-cost">200</div><div class="ex-unit">pts</div></div>
+      </div>
+      <div class="exchange-item" onclick="doExchange(500,'100円おこづかい')">
+        <div class="ex-info">
+          <div class="ex-name">🪙 100円おこづかい</div>
+          <div class="ex-desc">よくがんばった証</div>
+        </div>
+        <div><div class="ex-cost">500</div><div class="ex-unit">pts</div></div>
+      </div>
+      <div class="exchange-item" onclick="doExchange(2000,'500円おこづかい')">
+        <div class="ex-info">
+          <div class="ex-name">👑 500円おこづかい</div>
+          <div class="ex-desc">伝説クラスの達成！</div>
+        </div>
+        <div><div class="ex-cost">2000</div><div class="ex-unit">pts</div></div>
+      </div>
+    </div>
+    <button class="exchange-close" onclick="closeExchange()">とじる</button>
+  </div>
+</div>
+
+<!-- Stats -->
+<div id="statsOverlay">
+  <div class="stats-card">
+    <div class="stats-title">DATA ANALYZE</div>
+    <div class="range-btns">
+      <button class="range-btn active" onclick="updateRange('day',this)">日次</button>
+      <button class="range-btn" onclick="updateRange('month',this)">月次</button>
+      <button class="range-btn" onclick="updateRange('all',this)">全期間</button>
+    </div>
+    <div class="chart-label">正解率 (%)</div>
+    <canvas id="scoreChart"></canvas>
+    <div class="chart-label">タイム (秒)</div>
+    <canvas id="timeChart"></canvas>
+    <button class="stats-close" onclick="closeStats()">とじる</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzxFUSzbL0dgkkjwr_IiFAiuLscQPFN70qOyK8OnQQbqm_j2eyXFBurTjK5LBsY-doCxQ/exec"; 
+// ===========================
+// DATA
+// ===========================
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyZJ27xaP6QNkCBS0Ucj4NLi9_KHyXmtBrEZW9LWssCAc6N1gKQaQ_e4w90taLEnYif3Q/exec";
+const PLAYER_NAME = "夏向";
 
-const eastJapan=[{name:"北海道",capital:"札幌市",file:"hokkaido.png"},{name:"青森県",capital:"青森市",file:"aomori.png"},{name:"岩手県",capital:"盛岡市",file:"iwate.png"},{name:"宮城県",capital:"仙台市",file:"miyagi.png"},{name:"秋田県",capital:"秋田市",file:"akita.png"},{name:"山形県",capital:"山形市",file:"yamagata.png"},{name:"福島県",capital:"福島市",file:"fukushima.png"},{name:"茨城県",capital:"水戸市",file:"ibaraki.png"},{name:"栃木県",capital:"宇都宮市",file:"tochigi.png"},{name:"群馬県",capital:"前橋市",file:"gunma.png"},{name:"埼玉県",capital:"さいたま市",file:"saitama.png"},{name:"千葉県",capital:"千葉市",file:"chiba.png"},{name:"東京都",capital:"新宿区",file:"tokyo.png"},{name:"神奈川県",capital:"横浜市",file:"kanagawa.png"}];
-const westJapan=[{name:"新潟県",capital:"新潟市",file:"niigata.png"},{name:"富山県",capital:"富山市",file:"toyama.png"},{name:"石川県",capital:"金沢市",file:"ishikawa.png"},{name:"福井県",capital:"福井市",file:"fukui.png"},{name:"山梨県",capital:"甲府市",file:"yamanashi.png"},{name:"長野県",capital:"長野市",file:"nagano.png"},{name:"岐阜県",capital:"岐阜市",file:"gifu.png"},{name:"静岡県",capital:"静岡市",file:"shizuoka.png"},{name:"愛知県",capital:"名古屋市",file:"aichi.png"},{name:"三重県",capital:"津市",file:"mie.png"},{name:"滋賀県",capital:"大津市",file:"shiga.png"},{name:"京都府",capital:"京都市",file:"kyoto.png"},{name:"大阪府",capital:"大阪市",file:"osaka.png"},{name:"兵庫県",capital:"神戸市",file:"hyogo.png"},{name:"奈良県",capital:"奈良市",file:"nara.png"},{name:"和歌山県",capital:"和歌山市",file:"wakayama.png"},{name:"鳥取県",capital:"鳥取市",file:"tottori.png"},{name:"島根県",capital:"松江市",file:"shimane.png"},{name:"岡山県",capital:"岡山市",file:"okayama.png"},{name:"広島県",capital:"広島市",file:"hiroshima.png"},{name:"山口県",capital:"山口市",file:"yamaguchi.png"},{name:"徳島県",capital:"徳島市",file:"tokushima.png"},{name:"香川県",capital:"高松市",file:"kagawa.png"},{name:"愛媛県",capital:"松山市",file:"ehime.png"},{name:"高知県",capital:"高知市",file:"kochi.png"},{name:"福岡県",capital:"福岡市",file:"fukuoka.png"},{name:"佐賀県",capital:"佐賀市",file:"saga.png"},{name:"長崎県",capital:"長崎市",file:"nagasaki.png"},{name:"熊本県",capital:"熊本市",file:"kumamoto.png"},{name:"大分県",capital:"大分市",file:"oita.png"},{name:"宮崎県",capital:"宮崎市",file:"miyazaki.png"},{name:"鹿児島県",capital:"鹿児島市",file:"kagoshima.png"},{name:"沖縄県",capital:"那覇市",file:"okinawa.png"}];
+const eastJapan = [
+  {name:"北海道",capital:"札幌市",file:"hokkaido.png"},{name:"青森県",capital:"青森市",file:"aomori.png"},
+  {name:"岩手県",capital:"盛岡市",file:"iwate.png"},{name:"宮城県",capital:"仙台市",file:"miyagi.png"},
+  {name:"秋田県",capital:"秋田市",file:"akita.png"},{name:"山形県",capital:"山形市",file:"yamagata.png"},
+  {name:"福島県",capital:"福島市",file:"fukushima.png"},{name:"茨城県",capital:"水戸市",file:"ibaraki.png"},
+  {name:"栃木県",capital:"宇都宮市",file:"tochigi.png"},{name:"群馬県",capital:"前橋市",file:"gunma.png"},
+  {name:"埼玉県",capital:"さいたま市",file:"saitama.png"},{name:"千葉県",capital:"千葉市",file:"chiba.png"},
+  {name:"東京都",capital:"新宿区",file:"tokyo.png"},{name:"神奈川県",capital:"横浜市",file:"kanagawa.png"}
+];
+const westJapan = [
+  {name:"新潟県",capital:"新潟市",file:"niigata.png"},{name:"富山県",capital:"富山市",file:"toyama.png"},
+  {name:"石川県",capital:"金沢市",file:"ishikawa.png"},{name:"福井県",capital:"福井市",file:"fukui.png"},
+  {name:"山梨県",capital:"甲府市",file:"yamanashi.png"},{name:"長野県",capital:"長野市",file:"nagano.png"},
+  {name:"岐阜県",capital:"岐阜市",file:"gifu.png"},{name:"静岡県",capital:"静岡市",file:"shizuoka.png"},
+  {name:"愛知県",capital:"名古屋市",file:"aichi.png"},{name:"三重県",capital:"津市",file:"mie.png"},
+  {name:"滋賀県",capital:"大津市",file:"shiga.png"},{name:"京都府",capital:"京都市",file:"kyoto.png"},
+  {name:"大阪府",capital:"大阪市",file:"osaka.png"},{name:"兵庫県",capital:"神戸市",file:"hyogo.png"},
+  {name:"奈良県",capital:"奈良市",file:"nara.png"},{name:"和歌山県",capital:"和歌山市",file:"wakayama.png"},
+  {name:"鳥取県",capital:"鳥取市",file:"tottori.png"},{name:"島根県",capital:"松江市",file:"shimane.png"},
+  {name:"岡山県",capital:"岡山市",file:"okayama.png"},{name:"広島県",capital:"広島市",file:"hiroshima.png"},
+  {name:"山口県",capital:"山口市",file:"yamaguchi.png"},{name:"徳島県",capital:"徳島市",file:"tokushima.png"},
+  {name:"香川県",capital:"高松市",file:"kagawa.png"},{name:"愛媛県",capital:"松山市",file:"ehime.png"},
+  {name:"高知県",capital:"高知市",file:"kochi.png"},{name:"福岡県",capital:"福岡市",file:"fukuoka.png"},
+  {name:"佐賀県",capital:"佐賀市",file:"saga.png"},{name:"長崎県",capital:"長崎市",file:"nagasaki.png"},
+  {name:"熊本県",capital:"熊本市",file:"kumamoto.png"},{name:"大分県",capital:"大分市",file:"oita.png"},
+  {name:"宮崎県",capital:"宮崎市",file:"miyazaki.png"},{name:"鹿児島県",capital:"鹿児島市",file:"kagoshima.png"},
+  {name:"沖縄県",capital:"那覇市",file:"okinawa.png"}
+];
 const allJapan = eastJapan.concat(westJapan);
 
-let currentList=[], current, score=0, levelMode=1, totalQuestions=0, sessionStartTime=Date.now(), gameStartTime=0, sessionWrongNames=[];
-let rawChartData = []; 
-let currentRange = 'day';
-
-const app = {
-    nextQuestion: function() {
-        if(currentList.length===0){ this.finishGame(); return; }
-        document.getElementById("nextBtn").classList.add("hidden");
-        document.getElementById("ansBtn").classList.remove("hidden");
-        let index = Math.floor(Math.random()*currentList.length);
-        current = currentList.splice(index,1)[0];
-        document.getElementById("prefImage").src = current.file;
-        document.getElementById("prefName").textContent = (levelMode<=3 || levelMode==='revive')?current.name:"？";
-        document.getElementById("capitalAnswer").value="";
-        document.getElementById("prefAnswer").value="";
-        document.getElementById("result").textContent="";
-        document.getElementById("remaining").textContent = currentList.length;
-    },
-    checkAnswer: function() {
-        let cap = document.getElementById("capitalAnswer").value.trim().replace(/[市|区]$/, "");
-        let targetCap = current.capital.replace(/[市|区]$/, "");
-        if(cap === targetCap){
-            score++;
-            document.getElementById("result").textContent = "CRITICAL HIT!";
-            document.getElementById("result").className = "correct";
-        } else {
-            sessionWrongNames.push(current.name);
-            document.getElementById("result").innerHTML = `MISS! 正解:${current.capital}`;
-            document.getElementById("result").className = "wrong";
-        }
-        document.getElementById("score").textContent = score;
-        document.getElementById("ansBtn").classList.add("hidden");
-        document.getElementById("nextBtn").classList.remove("hidden");
-    },
-    finishGame: async function() {
-        const clearTime = Math.floor((Date.now() - gameStartTime) / 1000);
-        document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-        document.getElementById("finish").classList.remove("hidden");
-        let percent = Math.round((score/totalQuestions)*100);
-        document.getElementById("finalScore").innerHTML = `討伐率: ${percent}%`;
-        document.getElementById("finalTime").textContent = `TIME: ${clearTime}s (${score}/${totalQuestions})`;
-        document.getElementById("wrongList").textContent = sessionWrongNames.length > 0 ? "未達成: " + sessionWrongNames.join(", ") : "ALL CLEAR!";
-        let todayWrong = JSON.parse(localStorage.getItem("today_wrong") || "[]");
-        localStorage.setItem("today_wrong", JSON.stringify([...new Set([...todayWrong, ...sessionWrongNames])]));
-        if(percent > (localStorage.getItem("best_p_"+levelMode)||0)) localStorage.setItem("best_p_"+levelMode, percent);
-        if(percent === 100 && clearTime < (localStorage.getItem("best_t_"+levelMode)||9999)) localStorage.setItem("best_t_"+levelMode, clearTime);
-        try { await fetch(GAS_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({level: levelMode, score: score, percent: percent, time: clearTime, wrongPrefs: sessionWrongNames.join(",")}) }); } catch(e) {}
-        displayBest();
-    }
+// ===========================
+// POINT CONFIG
+// ===========================
+// 全問正解時のみ付与するポイント（レベル別）
+const POINT_TABLE = {
+  1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 10, revive: 1
+};
+const EXP_TABLE = {
+  1: 5, 2: 8, 3: 10, 4: 12, 5: 15, 6: 30, revive: 5
 };
 
-function startGame(level){
-    document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-    levelMode=level; score=0; sessionWrongNames=[]; gameStartTime = Date.now();
-    document.getElementById("game").classList.remove("hidden");
-    if(level==='revive') {
-        let targets = JSON.parse(localStorage.getItem("today_wrong") || "[]");
-        if(targets.length === 0) { alert("リベンジ対象がいません！"); backToMenu(); return; }
-        currentList = allJapan.filter(p => targets.includes(p.name));
-        localStorage.setItem("today_wrong", "[]"); 
-    } else {
-        if(level==1||level==4) currentList=[...eastJapan]; else if(level==2||level==5) currentList=[...westJapan]; else currentList=[...allJapan];
+// ===========================
+// STATE
+// ===========================
+let state = {
+  currentList: [], current: null, score: 0, levelMode: 1,
+  totalQuestions: 0, gameStartTime: 0, sessionWrongNames: [],
+  combo: 0, maxCombo: 0, ptsEarned: 0, expEarned: 0,
+};
+let playerData = {
+  totalPoints: 0, spentPoints: 0, totalExp: 0,
+  charLevel: 1, charName: '見習い探検家', title: '🌱 ルーキー',
+  maxCombo: 0, totalGames: 0, availablePoints: 0,
+};
+let sessionStartTime = Date.now();
+let rawChartData = [];
+let currentRange = 'day';
+
+// ===========================
+// CHAR DATA
+// ===========================
+const CHAR_AVATARS = ['🗾','🌏','🗺️','⚔️','🛡️','🌟','👑','🔥','💎','🏆'];
+const CHAR_NAMES = [
+  '','見習い探検家','地図職人','旅人','冒険者','勇者',
+  '猛者','地理の達人','都市の案内人','知恵の戦士','伝説の地理士',
+  '大陸の覇者','全国制覇者','地図の神','都道府県マスター','伝説の探求者'
+];
+
+function calcLevel(exp) { return Math.min(15, Math.floor(exp / 100) + 1); }
+function getCharAvatar(level) { return CHAR_AVATARS[Math.min(level - 1, CHAR_AVATARS.length - 1)]; }
+function getCharName(level) { return CHAR_NAMES[Math.min(level, CHAR_NAMES.length - 1)] || '伝説の探求者'; }
+
+// ===========================
+// UI HELPERS
+// ===========================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function updatePlayerUI() {
+  const lv = calcLevel(playerData.totalExp);
+  const expInLevel = playerData.totalExp % 100;
+  const charName = getCharName(lv);
+  document.getElementById('charAvatar').textContent = 'Lv.' + lv;
+  document.getElementById('playerNameDisplay').textContent = PLAYER_NAME.toUpperCase();
+  document.getElementById('playerTitleDisplay').textContent = playerData.title || '🌱 ルーキー';
+  document.getElementById('charNameDisplay').textContent = `${charName} Lv.${lv}`;
+  document.getElementById('expFill').style.width = expInLevel + '%';
+  document.getElementById('expLabel').textContent = `${expInLevel} / 100`;
+  document.getElementById('totalPtsDisplay').textContent = playerData.totalPoints || 0;
+  document.getElementById('availPtsDisplay').textContent = (playerData.totalPoints || 0) - (playerData.spentPoints || 0);
+  document.getElementById('maxComboDisplay').textContent = playerData.maxCombo || 0;
+}
+
+function displayBest() {
+  const row = document.getElementById('bestRow');
+  row.innerHTML = '';
+  for (let i = 1; i <= 6; i++) {
+    const p = localStorage.getItem('best_p_' + i) || 0;
+    const t = localStorage.getItem('best_t_' + i) || '-';
+    const chip = document.createElement('div');
+    chip.className = 'best-chip' + (p >= 100 ? ' gold' : '');
+    chip.textContent = `LV${i}: ${p}%(${t}s)`;
+    row.appendChild(chip);
+  }
+}
+
+// ===========================
+// GAME LOGIC
+// ===========================
+function startGame(level) {
+  state.levelMode = level;
+  state.score = 0;
+  state.combo = 0;
+  state.maxCombo = 0;
+  state.ptsEarned = 0;
+  state.expEarned = 0;
+  state.sessionWrongNames = [];
+  state.gameStartTime = Date.now();
+
+  if (level === 'revive') {
+    const targets = JSON.parse(localStorage.getItem('today_wrong') || '[]');
+    if (targets.length === 0) { showToast('リベンジ対象がいません！'); return; }
+    state.currentList = allJapan.filter(p => targets.includes(p.name));
+    localStorage.setItem('today_wrong', '[]');
+  } else {
+    if (level == 1 || level == 4) state.currentList = [...eastJapan];
+    else if (level == 2 || level == 5) state.currentList = [...westJapan];
+    else state.currentList = [...allJapan];
+  }
+  state.totalQuestions = state.currentList.length;
+
+  const levelNames = { 1:'LV.1 東日本', 2:'LV.2 西日本', 3:'LV.3 全国版', 4:'LV.4 視覚:東', 5:'LV.5 視覚:西', 6:'LV.MAX 究極', revive:'REVIVE' };
+  document.getElementById('gameLevelTag').textContent = levelNames[level] || level;
+  document.getElementById('totalQ').textContent = state.totalQuestions;
+  document.getElementById('score').textContent = 0;
+
+  showScreen('gameScreen');
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (state.currentList.length === 0) { finishGame(); return; }
+  document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('ansBtn').style.display = 'block';
+
+  const index = Math.floor(Math.random() * state.currentList.length);
+  state.current = state.currentList.splice(index, 1)[0];
+
+  const showName = (state.levelMode <= 3 || state.levelMode === 'revive');
+  document.getElementById('prefName').textContent = showName ? state.current.name : '？';
+
+  const img = document.getElementById('prefImage');
+  if (state.levelMode >= 4 || state.levelMode === 6) {
+    img.src = state.current.file;
+    img.style.display = '';
+  } else {
+    img.style.display = 'none';
+  }
+
+  document.getElementById('capitalAnswer').value = '';
+  document.getElementById('prefAnswer').value = '';
+  document.getElementById('result').textContent = '';
+  document.getElementById('result').className = '';
+  document.getElementById('remaining').textContent = state.currentList.length;
+  document.getElementById('capitalAnswer').focus();
+  updateComboUI();
+}
+
+// ポイントは全問正解時のみfinishGameで付与
+
+function checkAnswer() {
+  const cap = document.getElementById('capitalAnswer').value.trim().replace(/[市区]$/, '');
+  const targetCap = state.current.capital.replace(/[市区]$/, '');
+  const correct = (cap === targetCap);
+
+  if (correct) {
+    state.score++;
+    state.combo++;
+    if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+    document.getElementById('result').textContent = '✅ CRITICAL HIT!';
+    document.getElementById('result').className = 'correct';
+    document.getElementById('score').textContent = state.score;
+    updateComboUI();
+  } else {
+    state.combo = 0;
+    state.sessionWrongNames.push(state.current.name);
+    document.getElementById('result').innerHTML = `❌ 正解: ${state.current.capital}`;
+    document.getElementById('result').className = 'wrong';
+    document.getElementById('battleZone').style.animation = 'none';
+    setTimeout(() => document.getElementById('battleZone').style.animation = '', 50);
+    document.getElementById('missCount').textContent = state.sessionWrongNames.length;
+    updateComboUI();
+  }
+
+  document.getElementById('ansBtn').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'block';
+}
+
+function updateComboUI() {
+  const badge = document.getElementById('comboBadge');
+  if (state.combo >= 3) {
+    badge.textContent = state.combo + ' COMBO!';
+    badge.classList.add('show');
+    badge.classList.toggle('mega', state.combo >= 10);
+  } else {
+    badge.classList.remove('show', 'mega');
+  }
+}
+
+function spawnFloat(text, color) {
+  const zone = document.getElementById('battleZone');
+  const el = document.createElement('div');
+  el.className = 'float-score';
+  el.textContent = text;
+  el.style.color = color;
+  el.style.top = (20 + Math.random() * 30) + 'px';
+  el.style.left = (20 + Math.random() * 60) + '%';
+  zone.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+// ===========================
+// FINISH
+// ===========================
+async function finishGame() {
+  const clearTime = Math.floor((Date.now() - state.gameStartTime) / 1000);
+  const percent = Math.round((state.score / state.totalQuestions) * 100);
+  const level = state.levelMode;
+
+  // DOM
+  showScreen('finishScreen');
+  document.getElementById('finishPercent').textContent = percent + '%';
+  document.getElementById('finishTime').textContent = `${state.score}/${state.totalQuestions} 正解  |  ${clearTime}秒`;
+  // ポイントの仮計算（全問正解時のみ。1日1回チェックはGAS側で実施）
+  state.ptsEarned = percent === 100 ? (POINT_TABLE[level] || 1) : 0;
+  state.expEarned = percent === 100 ? (EXP_TABLE[level] || 5) : 0;
+
+  // 表示は仮で出しておく（GAS応答後に更新）
+  document.getElementById('r-pts').textContent = '...';
+  document.getElementById('r-exp').textContent = '...';
+  document.getElementById('r-combo').textContent = state.maxCombo;
+
+  const wrongEl = document.getElementById('wrongList');
+  if (state.sessionWrongNames.length > 0) {
+    wrongEl.textContent = '未達成: ' + state.sessionWrongNames.join('、');
+    wrongEl.className = 'wrong-list';
+  } else {
+    wrongEl.textContent = '🌟 ALL CLEAR!';
+    wrongEl.className = 'wrong-list all-clear';
+  }
+
+  // LocalStorage（ベスト記録・リベンジ用）
+  const todayWrong = JSON.parse(localStorage.getItem('today_wrong') || '[]');
+  localStorage.setItem('today_wrong', JSON.stringify([...new Set([...todayWrong, ...state.sessionWrongNames])]));
+  if (percent > (localStorage.getItem('best_p_' + level) || 0)) localStorage.setItem('best_p_' + level, percent);
+  if (percent === 100 && clearTime < (localStorage.getItem('best_t_' + level) || 9999)) localStorage.setItem('best_t_' + level, clearTime);
+
+  // GAS: 記録保存＋1日1回チェック＋プレイヤーデータ更新はサーバー側で完結
+  try {
+    const prevLv = calcLevel(playerData.totalExp);
+    const body = {
+      action: 'saveRecord',
+      player: PLAYER_NAME,
+      level: level,
+      score: state.score,
+      percent: percent,
+      time: clearTime,
+      combo: state.maxCombo,
+      wrongPrefs: state.sessionWrongNames.join(','),
+      pointsEarned: state.ptsEarned,
+      expEarned: state.expEarned,
+    };
+    // no-corsでPOST後、GETで確定データを取得
+    await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(body) });
+    await new Promise(r => setTimeout(r, 1200));
+    const res2 = await fetch(GAS_URL + '?action=getPlayer&player=' + encodeURIComponent(PLAYER_NAME));
+    const data = await res2.json();
+    if (data && !data.error) {
+      // GASが実際に付与したポイントで表示を更新
+      const actualPts = data.pointsActuallyEarned ?? state.ptsEarned;
+      const alreadyEarned = data.alreadyEarned || false;
+      document.getElementById('r-pts').textContent = alreadyEarned
+        ? '0（本日取得済み）'
+        : actualPts;
+      document.getElementById('r-exp').textContent = alreadyEarned
+        ? '0（本日取得済み）'
+        : (data.totalExp - playerData.totalExp > 0 ? data.totalExp - playerData.totalExp : state.expEarned);
+      const newLv = calcLevel(data.totalExp);
+      if (newLv > prevLv) setTimeout(() => showLevelUp(newLv), 300);
+      playerData = data;
     }
-    totalQuestions = currentList.length; app.nextQuestion();
+  } catch (e) {
+    // GAS通信失敗時はローカルのポイントテーブルで仮表示
+    document.getElementById('r-pts').textContent = state.ptsEarned + (state.ptsEarned > 0 ? '' : '');
+    document.getElementById('r-exp').textContent = state.expEarned;
+    playerData.totalPoints = (playerData.totalPoints || 0) + state.ptsEarned;
+    playerData.totalExp = (playerData.totalExp || 0) + state.expEarned;
+    playerData.maxCombo = Math.max(playerData.maxCombo || 0, state.maxCombo);
+    playerData.totalGames = (playerData.totalGames || 0) + 1;
+    playerData.availablePoints = playerData.totalPoints - (playerData.spentPoints || 0);
+  }
 }
 
+// ===========================
+// LEVEL UP
+// ===========================
+function showLevelUp(lv) {
+  document.getElementById('levelUpLv').textContent = 'Lv.' + lv;
+  document.getElementById('levelUpName').textContent = getCharName(lv);
+  document.getElementById('levelUpOverlay').classList.add('show');
+}
+function closeLevelUp() {
+  document.getElementById('levelUpOverlay').classList.remove('show');
+}
+
+// ===========================
+// MENU
+// ===========================
+function backToMenu() {
+  showScreen('menuScreen');
+  updatePlayerUI();
+  displayBest();
+}
+
+function restartSameLevel() { startGame(state.levelMode); }
+
+// ===========================
+// EXCHANGE
+// ===========================
+function openExchange() {
+  const avail = (playerData.totalPoints || 0) - (playerData.spentPoints || 0);
+  document.getElementById('exchAvailPts').textContent = avail;
+  document.getElementById('exchangeOverlay').classList.add('show');
+}
+function closeExchange() {
+  document.getElementById('exchangeOverlay').classList.remove('show');
+}
+async function doExchange(cost, itemName) {
+  const avail = (playerData.totalPoints || 0) - (playerData.spentPoints || 0);
+  if (avail < cost) {
+    showToast('ポイントが足りないよ！もっとがんばろう！');
+    return;
+  }
+  if (!confirm(`「${itemName}」と交換する？\n${cost}ポイント使うよ`)) return;
+  playerData.spentPoints = (playerData.spentPoints || 0) + cost;
+  playerData.availablePoints = playerData.totalPoints - playerData.spentPoints;
+  document.getElementById('exchAvailPts').textContent = playerData.availablePoints;
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST', mode: 'no-cors',
+      body: JSON.stringify({ action: 'savePlayer', player: PLAYER_NAME, spentPoints: playerData.spentPoints })
+    });
+  } catch (e) {}
+  updatePlayerUI();
+  showToast(`🎉 ${itemName}と交換したよ！パパ/ママに見せよう！`);
+  closeExchange();
+}
+
+// ===========================
+// STATS
+// ===========================
 async function openStats() {
-    document.getElementById("statsOverlay").style.display = "flex";
-    try {
-        const res = await fetch(GAS_URL);
-        rawChartData = await res.json();
-        renderCharts();
-    } catch(e) { console.error("データ取得失敗", e); }
-}
-
-function updateRange(range) {
-    currentRange = range;
+  document.getElementById('statsOverlay').classList.add('show');
+  try {
+    const res = await fetch(GAS_URL + '?action=getRecords');
+    rawChartData = await res.json();
     renderCharts();
+  } catch (e) {
+    console.error('データ取得失敗', e);
+    showToast('⚠️ データ取得失敗。GASのデプロイURLを確認してね');
+  }
+}
+function closeStats() { document.getElementById('statsOverlay').classList.remove('show'); }
+
+function updateRange(range, btn) {
+  currentRange = range;
+  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCharts();
 }
 
 function renderCharts() {
-    if (!rawChartData || rawChartData.length === 0) return;
-    const dailyBestMap = {};
-    rawChartData.forEach(d => {
-        const dateStr = String(d.date);
-        const key = currentRange === 'month' ? dateStr.substring(0, 7) : dateStr.substring(0, 10);
-        const p = Number(d.percent) || 0;
-        const t = Number(d.time) || 0;
-        if (!dailyBestMap[key]) {
-            dailyBestMap[key] = { label: key, maxP: p, minT: t };
-        } else {
-            if (p > dailyBestMap[key].maxP) dailyBestMap[key].maxP = p;
-            if (t > 0 && (dailyBestMap[key].minT === 0 || t < dailyBestMap[key].minT)) dailyBestMap[key].minT = t;
-        }
-    });
-    let sortedData = Object.values(dailyBestMap).sort((a, b) => a.label.localeCompare(b.label));
-    if (currentRange === 'day') sortedData = sortedData.slice(-14);
-    else if (currentRange === 'month') sortedData = sortedData.slice(-12);
-    const labels = sortedData.map(d => currentRange === 'day' ? d.label.slice(5) : d.label);
-    const scoreData = sortedData.map(d => d.maxP);
-    const timeData = sortedData.map(d => d.minT);
-    const commonOptions = {
-        scales: { 
-            y: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } }, 
-            x: { grid: { color: "#222" }, ticks: { color: "#888", font: { size: 10 } } } 
-        },
-        plugins: { legend: { labels: { color: "#fff", font: { size: 10 } } } },
-        elements: { line: { tension: 0 }, point: { radius: currentRange === 'all' ? 2 : 5 } }
-    };
-    if (window.scChart) window.scChart.destroy();
-    window.scChart = new Chart(document.getElementById('scoreChart'), {
-        type: 'line',
-        data: { labels: labels, datasets: [{ label: '最高正解率(%)', data: scoreData, borderColor: '#00d9ff', backgroundColor: 'rgba(0,217,255,0.1)', fill: true }] },
-        options: commonOptions
-    });
-    if (window.tmChart) window.tmChart.destroy();
-    window.tmChart = new Chart(document.getElementById('timeChart'), {
-        type: 'line',
-        data: { labels: labels, datasets: [{ label: '最速タイム(秒)', data: timeData, borderColor: '#ff3b3b' }] },
-        options: commonOptions
-    });
+  if (!rawChartData || rawChartData.length === 0) return;
+  const map = {};
+  rawChartData.forEach(d => {
+    const dateStr = String(d.date);
+    const key = currentRange === 'month' ? dateStr.substring(0, 7) : dateStr.substring(0, 10);
+    const p = Number(d.percent) || 0;
+    const t = Number(d.time) || 0;
+    if (!map[key]) map[key] = { label: key, maxP: p, minT: t };
+    else {
+      if (p > map[key].maxP) map[key].maxP = p;
+      if (t > 0 && (map[key].minT === 0 || t < map[key].minT)) map[key].minT = t;
+    }
+  });
+  let sorted = Object.values(map).sort((a, b) => a.label.localeCompare(b.label));
+  if (currentRange === 'day') sorted = sorted.slice(-14);
+  else if (currentRange === 'month') sorted = sorted.slice(-12);
+  const labels = sorted.map(d => currentRange === 'day' ? d.label.slice(5) : d.label);
+  const opts = {
+    responsive: true,
+    scales: {
+      y: { grid: { color: '#1a2235' }, ticks: { color: '#666', font: { size: 9 } } },
+      x: { grid: { color: '#1a2235' }, ticks: { color: '#666', font: { size: 9 } } }
+    },
+    plugins: { legend: { labels: { color: '#888', font: { size: 10 } } } },
+    elements: { line: { tension: 0.3 }, point: { radius: currentRange === 'all' ? 2 : 4 } }
+  };
+  if (window.scChart) window.scChart.destroy();
+  window.scChart = new Chart(document.getElementById('scoreChart'), {
+    type: 'line',
+    data: { labels, datasets: [{ label: '最高正解率(%)', data: sorted.map(d => d.maxP), borderColor: '#4fc3f7', backgroundColor: 'rgba(79,195,247,0.1)', fill: true }] },
+    options: opts
+  });
+  if (window.tmChart) window.tmChart.destroy();
+  window.tmChart = new Chart(document.getElementById('timeChart'), {
+    type: 'line',
+    data: { labels, datasets: [{ label: '最速タイム(秒)', data: sorted.map(d => d.minT), borderColor: '#ff4757' }] },
+    options: opts
+  });
 }
 
-function closeStats() { document.getElementById("statsOverlay").style.display = "none"; }
-function displayBest(){
-    let text = "<b>[RANKING DATA]</b><br>";
-    for(let i=1;i<=6;i++){
-        let p = localStorage.getItem("best_p_"+i) || 0; let t = localStorage.getItem("best_t_"+i) || "-";
-        text += `LV${i}:${p}%(${t}s) | `; if(i==3) text += "<br>";
-    }
-    document.getElementById("bestDisplay").innerHTML = text;
+// ===========================
+// LOAD PLAYER
+// ===========================
+async function loadPlayer() {
+  try {
+    const res = await fetch(GAS_URL + '?action=getPlayer&player=' + encodeURIComponent(PLAYER_NAME));
+    const data = await res.json();
+    if (data && !data.error) playerData = data;
+  } catch (e) {}
+  updatePlayerUI();
 }
-function backToMenu(){ document.querySelectorAll('.card').forEach(c => c.classList.add('hidden')); document.getElementById("menu").classList.remove("hidden"); displayBest(); }
-function restartSameLevel(){ startGame(levelMode); }
-setInterval(()=>{
-    let sec = Math.floor((Date.now()-sessionStartTime)/1000);
-    document.getElementById("playTime").textContent = `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
-},1000);
-window.onload = () => { displayBest(); };
+
+// ===========================
+// ENTER KEY
+// ===========================
+document.getElementById('capitalAnswer').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('ansBtn').style.display !== 'none' && document.getElementById('ansBtn').style.display !== '') {
+      checkAnswer();
+    } else {
+      nextQuestion();
+    }
+  }
+});
+
+// ===========================
+// TIMER
+// ===========================
+setInterval(() => {
+  const sec = Math.floor((Date.now() - sessionStartTime) / 1000);
+  document.getElementById('playTime').textContent = `SESSION ${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+}, 1000);
+
+// ===========================
+// INIT
+// ===========================
+window.onload = () => {
+  displayBest();
+  loadPlayer();
+};
 </script>
 </body>
 </html>
