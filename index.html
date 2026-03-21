@@ -4,806 +4,1050 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PREF_MASTER: THE QUEST Ver2.0</title>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Dots&family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-/* ===== DESIGN SYSTEM ===== */
+/* ==============================
+   MINECRAFT DESIGN SYSTEM
+   ============================== */
 :root {
-  --bg: #0a0e1a;
-  --panel: #111827;
-  --panel2: #1a2235;
-  --text: #e8eaf6;
-  --gold: #ffd700;
-  --gold2: #ffaa00;
-  --red: #ff4757;
-  --blue: #4fc3f7;
-  --blue2: #0288d1;
-  --green: #69f0ae;
-  --purple: #ce93d8;
-  --cyan: #00e5ff;
-  --border: #1e3a5f;
-  --combo: #ff6b35;
-  --exp: #a5d6a7;
+  --mc-bg:       #1d1d1d;
+  --mc-stone:    #828282;
+  --mc-stone-h:  #9d9d9d;
+  --mc-stone-s:  #5a5a5a;
+  --mc-dirt:     #866043;
+  --mc-grass:    #5a9e32;
+  --mc-grass-h:  #76c93e;
+  --mc-grass-s:  #3d7020;
+  --mc-wood:     #7a5c2e;
+  --mc-wood-h:   #9a7848;
+  --mc-wood-s:   #4a3c1e;
+  --mc-diamond:  #4de0d0;
+  --mc-diamond-h:#7aeae0;
+  --mc-diamond-s:#2aada0;
+  --mc-gold:     #ffaa00;
+  --mc-gold-h:   #ffcc44;
+  --mc-gold-s:   #aa6600;
+  --mc-red:      #c03030;
+  --mc-red-h:    #e04040;
+  --mc-red-s:    #801818;
+  --mc-green:    #44aa22;
+  --mc-text:     #ffffff;
+  --mc-text-dim: #aaaaaa;
+  --mc-shadow:   #3f3f3f;
+  --mc-black:    #080808;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; image-rendering: pixelated; }
 
 body {
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  font-family: 'DotGothic16', 'Press Start 2P', monospace;
+  background: var(--mc-bg);
+  color: var(--mc-text);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 10px;
+  padding: 10px 8px 50px;
   background-image:
-    radial-gradient(ellipse at 20% 20%, rgba(0,100,200,0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(100,0,200,0.06) 0%, transparent 50%);
+    repeating-linear-gradient(0deg,  transparent, transparent 15px, rgba(0,0,0,0.08) 15px, rgba(0,0,0,0.08) 16px),
+    repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(0,0,0,0.08) 15px, rgba(0,0,0,0.08) 16px);
 }
 
 .screen { width: 100%; max-width: 420px; display: none; }
 .screen.active { display: block; }
 
-/* ===== CARDS ===== */
-.card {
-  background: var(--panel);
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid var(--border);
-  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
-  margin-bottom: 12px;
+/* ==============================
+   MC BLOCK MIXIN (石ブロック風)
+   ============================== */
+.mc-block {
+  background: var(--mc-stone);
+  border: none;
+  box-shadow:
+    inset -4px -4px 0 var(--mc-stone-s),
+    inset  4px  4px 0 var(--mc-stone-h),
+    0 4px 0 var(--mc-black);
+  border-radius: 0;
+}
+.mc-block-dark {
+  background: #3a3a3a;
+  box-shadow:
+    inset -4px -4px 0 #1a1a1a,
+    inset  4px  4px 0 #555,
+    0 4px 0 var(--mc-black);
 }
 
-/* ===== TITLE ===== */
-.game-title {
-  font-family: 'Zen Dots', monospace;
-  font-size: 1.4rem;
-  color: var(--gold);
+/* ==============================
+   BUTTON BASE
+   ============================== */
+.mc-btn {
+  display: block;
+  width: 100%;
+  padding: 14px 10px;
+  font-family: 'DotGothic16', monospace;
+  font-size: 15px;
+  font-weight: normal;
   text-align: center;
+  cursor: pointer;
+  border: none;
+  color: var(--mc-text);
+  text-shadow: 2px 2px 0 var(--mc-black);
+  transition: filter 0.05s;
+  background: var(--mc-stone);
+  box-shadow:
+    inset -4px -4px 0 var(--mc-stone-s),
+    inset  4px  4px 0 var(--mc-stone-h),
+    0 4px 0 var(--mc-black);
+  margin-bottom: 6px;
+}
+.mc-btn:active {
+  box-shadow:
+    inset -2px -2px 0 var(--mc-stone-s),
+    inset  2px  2px 0 var(--mc-stone-h),
+    0 2px 0 var(--mc-black);
+  transform: translateY(2px);
+}
+
+.mc-btn-green {
+  background: var(--mc-grass);
+  box-shadow:
+    inset -4px -4px 0 var(--mc-grass-s),
+    inset  4px  4px 0 var(--mc-grass-h),
+    0 4px 0 var(--mc-black);
+}
+.mc-btn-green:active {
+  box-shadow:
+    inset -2px -2px 0 var(--mc-grass-s),
+    inset  2px  2px 0 var(--mc-grass-h),
+    0 2px 0 var(--mc-black);
+  transform: translateY(2px);
+}
+
+.mc-btn-gold {
+  background: var(--mc-wood);
+  box-shadow:
+    inset -4px -4px 0 var(--mc-wood-s),
+    inset  4px  4px 0 var(--mc-wood-h),
+    0 4px 0 var(--mc-black);
+}
+.mc-btn-gold:active {
+  box-shadow:
+    inset -2px -2px 0 var(--mc-wood-s),
+    inset  2px  2px 0 var(--mc-wood-h),
+    0 2px 0 var(--mc-black);
+  transform: translateY(2px);
+}
+
+.mc-btn-red {
+  background: var(--mc-red);
+  box-shadow:
+    inset -4px -4px 0 var(--mc-red-s),
+    inset  4px  4px 0 var(--mc-red-h),
+    0 4px 0 var(--mc-black);
+}
+.mc-btn-red:active {
+  box-shadow:
+    inset -2px -2px 0 var(--mc-red-s),
+    inset  2px  2px 0 var(--mc-red-h),
+    0 2px 0 var(--mc-black);
+  transform: translateY(2px);
+}
+
+.mc-btn-diamond {
+  background: var(--mc-diamond);
+  color: var(--mc-black);
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+  box-shadow:
+    inset -4px -4px 0 var(--mc-diamond-s),
+    inset  4px  4px 0 var(--mc-diamond-h),
+    0 4px 0 var(--mc-black);
+}
+.mc-btn-diamond:active {
+  box-shadow:
+    inset -2px -2px 0 var(--mc-diamond-s),
+    inset  2px  2px 0 var(--mc-diamond-h),
+    0 2px 0 var(--mc-black);
+  transform: translateY(2px);
+}
+
+.mc-btn-dark {
+  background: #3a3a3a;
+  box-shadow:
+    inset -4px -4px 0 #1a1a1a,
+    inset  4px  4px 0 #555,
+    0 4px 0 var(--mc-black);
+  color: #aaa;
+}
+.mc-btn-dark:active {
+  box-shadow:
+    inset -2px -2px 0 #1a1a1a,
+    inset  2px  2px 0 #555,
+    0 2px 0 var(--mc-black);
+  transform: translateY(2px);
+}
+
+/* ==============================
+   PANEL (インベントリ風)
+   ============================== */
+.mc-panel {
+  background: #c6c6c6;
+  box-shadow:
+    inset -4px -4px 0 #555,
+    inset  4px  4px 0 #fff,
+    0 4px 0 var(--mc-black);
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.mc-inset {
+  background: #8b8b8b;
+  box-shadow:
+    inset -3px -3px 0 #c6c6c6,
+    inset  3px  3px 0 #373737;
+  padding: 10px;
+}
+
+/* ==============================
+   TITLE BAR
+   ============================== */
+.mc-titlebar {
+  background: var(--mc-black);
+  padding: 14px 12px 10px;
+  text-align: center;
+  margin: -12px -12px 12px -12px;
+  border-bottom: 4px solid #000;
+}
+.mc-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  color: #fff;
+  text-shadow: 3px 3px 0 #3a3a3a, 5px 5px 0 #000;
   letter-spacing: 2px;
-  text-shadow: 0 0 20px rgba(255,215,0,0.5);
+  display: block;
+}
+.mc-subtitle {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #888;
+  letter-spacing: 1px;
+  margin-top: 6px;
+  display: block;
+}
+
+/* ==============================
+   PLAYER CARD (ダイヤ風)
+   ============================== */
+.mc-player-card {
+  background: #2e6e6e;
+  box-shadow:
+    inset -4px -4px 0 #1a3e3e,
+    inset  4px  4px 0 #4de0d0,
+    0 4px 0 var(--mc-black);
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.mc-player-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.mc-avatar {
+  width: 54px; height: 54px;
+  background: #1a1a1a;
+  box-shadow:
+    inset -3px -3px 0 #000,
+    inset  3px  3px 0 #555,
+    0 3px 0 var(--mc-black);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.5rem;
+  color: #55cc44;
+  flex-shrink: 0;
+  text-shadow: 1px 1px 0 #000;
+  line-height: 1.4;
+  text-align: center;
+}
+.mc-player-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: #fff;
+  text-shadow: 2px 2px 0 #000;
   margin-bottom: 4px;
 }
-.game-subtitle { font-size: 10px; color: #555; text-align: center; letter-spacing: 3px; margin-bottom: 16px; }
-
-/* ===== PLAYER CARD ===== */
-.player-card {
-  background: linear-gradient(135deg, #0d1b2a, #1a2744);
-  border: 1px solid #1e3a6e;
-  border-radius: 12px;
-  padding: 14px;
-  margin-bottom: 14px;
-  position: relative;
-  overflow: hidden;
+.mc-player-title {
+  font-size: 13px;
+  color: var(--mc-gold);
+  text-shadow: 1px 1px 0 #000;
+  margin-bottom: 3px;
 }
-.player-card::before {
-  content: '';
-  position: absolute;
-  top: -30px; right: -30px;
-  width: 100px; height: 100px;
-  background: radial-gradient(circle, rgba(79,195,247,0.15), transparent 70%);
+.mc-char-name {
+  font-size: 11px;
+  color: #4de0d0;
+  text-shadow: 1px 1px 0 #000;
 }
-.player-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-.char-avatar {
-  width: 56px; height: 56px;
-  background: linear-gradient(135deg, var(--blue2), var(--purple));
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.8rem;
-  flex-shrink: 0;
-  border: 2px solid var(--blue);
-  box-shadow: 0 0 15px rgba(79,195,247,0.3);
-}
-.player-info { flex: 1; min-width: 0; }
-.player-name { font-size: 13px; font-weight: 900; color: var(--blue); }
-.player-title { font-size: 10px; color: var(--gold); margin: 2px 0; }
-.char-name { font-size: 11px; color: #aaa; }
 
 /* EXP BAR */
-.exp-section { margin-top: 8px; }
-.exp-label { display: flex; justify-content: space-between; font-size: 10px; color: #888; margin-bottom: 4px; }
-.exp-bar { height: 6px; background: #1a2235; border-radius: 3px; overflow: hidden; }
-.exp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--green), var(--cyan));
-  border-radius: 3px;
-  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* POINT DISPLAY */
-.point-row { display: flex; gap: 8px; margin-top: 10px; }
-.point-box {
-  flex: 1;
-  background: #0a1628;
-  border: 1px solid #1e3a5f;
-  border-radius: 8px;
-  padding: 8px;
-  text-align: center;
-}
-.point-box .label { font-size: 9px; color: #666; margin-bottom: 2px; letter-spacing: 1px; }
-.point-box .value { font-family: 'Zen Dots', monospace; font-size: 1.1rem; color: var(--gold); }
-.point-box.available .value { color: var(--green); }
-.point-box .unit { font-size: 9px; color: #888; }
-
-/* ===== LEVEL GRID ===== */
-.level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-.level-btn {
-  background: linear-gradient(135deg, #0f1c2e, #1a2744);
-  border: 1px solid #1e3a5f;
-  border-radius: 10px;
-  padding: 12px 8px;
-  color: var(--blue);
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.15s;
-  position: relative;
-  overflow: hidden;
-}
-.level-btn:active { transform: scale(0.96); }
-.level-btn .lv-badge {
-  font-family: 'Zen Dots', monospace;
-  font-size: 9px;
-  color: #555;
-  display: block;
+.mc-exp-wrap { margin-bottom: 8px; }
+.mc-exp-label {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: #1a1a1a;
+  text-shadow: 1px 1px 0 #4de0d0;
   margin-bottom: 4px;
 }
-.level-btn .lv-name { display: block; }
-.level-btn .lv-pts {
-  font-size: 9px;
-  color: var(--gold);
-  display: block;
-  margin-top: 4px;
+.mc-exp-track {
+  height: 10px;
+  background: #1a1a1a;
+  box-shadow: inset 2px 2px 0 #000, inset -1px -1px 0 #333;
 }
-.level-btn.ultimate { 
-  background: linear-gradient(135deg, #1a0a2e, #2a1a44); 
-  border-color: var(--gold);
-  color: var(--gold);
-  grid-column: 1 / -1;
-}
-.level-btn.revive-btn {
-  background: linear-gradient(135deg, #1a0a0a, #2a1414);
-  border-color: var(--red);
-  color: var(--red);
-  grid-column: 1 / -1;
+.mc-exp-fill {
+  height: 100%;
+  background: #80ee44;
+  box-shadow: inset 0 -3px 0 #44aa11;
+  transition: width 0.6s steps(20);
 }
 
-/* ACTION BTNS */
-.action-btn {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
+/* POINT SLOTS */
+.mc-slots { display: flex; gap: 6px; }
+.mc-slot {
+  flex: 1;
+  background: #8b8b8b;
+  box-shadow:
+    inset -3px -3px 0 #c6c6c6,
+    inset  3px  3px 0 #373737;
+  padding: 8px 4px;
+  text-align: center;
+}
+.mc-slot-label { font-size: 10px; color: #1a1a1a; text-shadow: 1px 1px 0 #c6c6c6; margin-bottom: 3px; display: block; }
+.mc-slot-value { font-family: 'Press Start 2P', monospace; font-size: 0.85rem; color: #fff; text-shadow: 2px 2px 0 #000; display: block; }
+.mc-slot-value.green { color: #80ee44; }
+.mc-slot-unit { font-size: 9px; color: #444; display: block; margin-top: 2px; }
+
+/* ==============================
+   BEST RECORDS
+   ============================== */
+.mc-best-wrap {
+  background: #8b8b8b;
+  box-shadow:
+    inset -3px -3px 0 #c6c6c6,
+    inset  3px  3px 0 #373737;
+  padding: 8px 10px;
   margin-bottom: 8px;
-  transition: all 0.15s;
 }
-.action-btn:active { transform: scale(0.97); }
-.btn-stats { background: linear-gradient(135deg, #1a2e1a, #1a3a1a); color: var(--green); border: 1px solid var(--green); }
-.btn-exchange { background: linear-gradient(135deg, #2e1a00, #3a2a00); color: var(--gold); border: 1px solid var(--gold); }
+.mc-best-label { font-size: 10px; color: #1a1a1a; text-shadow: 1px 1px 0 #c6c6c6; margin-bottom: 6px; }
+.mc-best-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.mc-chip {
+  background: #555;
+  box-shadow: inset -2px -2px 0 #888, inset 2px 2px 0 #222;
+  padding: 3px 7px;
+  font-size: 10px;
+  color: #ccc;
+}
+.mc-chip.gold { color: var(--mc-gold); }
 
-/* ===== GAME SCREEN ===== */
-.game-header {
+/* ==============================
+   LEVEL GRID
+   ============================== */
+.mc-level-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.mc-level-btn {
+  background: var(--mc-stone);
+  box-shadow:
+    inset -4px -4px 0 var(--mc-stone-s),
+    inset  4px  4px 0 var(--mc-stone-h),
+    0 4px 0 var(--mc-black);
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  color: var(--mc-text);
+  font-family: 'DotGothic16', monospace;
+  transition: transform 0.05s;
+}
+.mc-level-btn:active {
+  box-shadow:
+    inset -2px -2px 0 var(--mc-stone-s),
+    inset  2px  2px 0 var(--mc-stone-h),
+    0 2px 0 var(--mc-black);
+  transform: translateY(2px);
+}
+.mc-level-btn .lv-no {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #555;
+  display: block;
+  margin-bottom: 5px;
+}
+.mc-level-btn .lv-name {
+  font-size: 15px;
+  color: #fff;
+  text-shadow: 2px 2px 0 #000;
+  display: block;
+  margin-bottom: 5px;
+}
+.mc-level-btn .lv-pt {
+  font-size: 10px;
+  color: var(--mc-gold);
+  text-shadow: 1px 1px 0 #000;
+  display: block;
+}
+.mc-level-btn.ultimate {
+  background: var(--mc-gold-s, #aa6600);
+  background: #aa6600;
+  box-shadow:
+    inset -4px -4px 0 #664000,
+    inset  4px  4px 0 #ddaa44,
+    0 4px 0 var(--mc-black);
+  grid-column: 1 / -1;
+}
+.mc-level-btn.ultimate .lv-name { color: #ffdd88; }
+.mc-level-btn.ultimate .lv-no { color: #cc8800; }
+.mc-level-btn.revive {
+  background: var(--mc-red);
+  box-shadow:
+    inset -4px -4px 0 var(--mc-red-s),
+    inset  4px  4px 0 var(--mc-red-h),
+    0 4px 0 var(--mc-black);
+  grid-column: 1 / -1;
+  padding: 10px;
+}
+.mc-level-btn.revive .lv-name { color: #ffaaaa; }
+
+/* ==============================
+   GAME SCREEN
+   ============================== */
+.mc-game-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #1e3a5f;
+  background: #1a1a1a;
+  padding: 10px 12px;
+  margin: -12px -12px 10px -12px;
+  border-bottom: 4px solid #000;
 }
-.game-header .level-tag {
-  font-family: 'Zen Dots', monospace;
-  font-size: 10px;
-  color: var(--blue);
-  background: rgba(79,195,247,0.1);
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(79,195,247,0.3);
+.mc-lv-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: #4de0d0;
+  text-shadow: 1px 1px 0 #000;
 }
-.remain-tag { font-size: 11px; color: #666; }
+.mc-remain {
+  font-size: 13px;
+  color: #aaa;
+  text-shadow: 1px 1px 0 #000;
+}
 
-/* COMBO DISPLAY */
-.combo-area {
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
+/* COMBO */
+.mc-combo-area {
+  height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 6px;
   position: relative;
 }
-.combo-badge {
-  font-family: 'Zen Dots', monospace;
-  font-size: 1.5rem;
-  color: var(--combo);
-  text-shadow: 0 0 20px var(--combo);
+.mc-combo-badge {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  color: #ff6622;
+  text-shadow: 2px 2px 0 #000;
   opacity: 0;
   transform: scale(0.5);
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.2s steps(4);
   position: absolute;
 }
-.combo-badge.show { opacity: 1; transform: scale(1); }
-.combo-badge.mega { font-size: 2rem; color: var(--gold); text-shadow: 0 0 30px var(--gold); animation: pulse 0.5s ease infinite alternate; }
-
-@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
-@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)} }
-@keyframes popIn { 0%{transform:scale(0) rotate(-10deg);opacity:0} 70%{transform:scale(1.2) rotate(3deg);opacity:1} 100%{transform:scale(1) rotate(0);opacity:1} }
-@keyframes floatUp { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(-40px);opacity:0} }
+.mc-combo-badge.show { opacity: 1; transform: scale(1); }
+.mc-combo-badge.mega { color: var(--mc-gold); animation: mcpulse 0.4s steps(2) infinite alternate; }
+@keyframes mcpulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+@keyframes mcshake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+@keyframes mcfloat { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(-36px);opacity:0} }
+@keyframes mcpopin { 0%{transform:scale(0);opacity:0} 60%{transform:scale(1.15);opacity:1} 100%{transform:scale(1);} }
 
 /* BATTLE ZONE */
-.battle-zone {
-  background: linear-gradient(180deg, #050d1a, #0a1628);
-  border: 1px solid #1e3a5f;
-  border-radius: 12px;
-  padding: 16px;
+.mc-battle {
+  background: #1a1a1a;
+  box-shadow:
+    inset -4px -4px 0 #000,
+    inset  4px  4px 0 #333,
+    0 4px 0 var(--mc-black);
+  padding: 16px 12px;
   text-align: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   min-height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
-  overflow: hidden;
 }
-.battle-zone::before {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--blue), transparent);
-  animation: scan 2s linear infinite;
-}
-@keyframes scan { 0%{opacity:0.3} 50%{opacity:1} 100%{opacity:0.3} }
-
 #prefName {
-  font-size: 1.8rem;
-  font-weight: 900;
+  font-size: 1.6rem;
   color: #fff;
-  text-shadow: 0 0 20px rgba(79,195,247,0.4);
-  margin-bottom: 12px;
-  line-height: 1.2;
+  text-shadow: 3px 3px 0 #000;
+  margin-bottom: 10px;
+  line-height: 1.3;
 }
 #prefImage {
   width: 160px; height: 110px;
   object-fit: contain;
   background: #fff;
-  border-radius: 8px;
-  border: 2px solid var(--gold);
-  box-shadow: 0 0 20px rgba(255,215,0,0.2);
-  margin-bottom: 12px;
+  border: 4px solid var(--mc-black);
+  box-shadow:
+    inset -2px -2px 0 #888,
+    inset  2px  2px 0 #ccc,
+    0 4px 0 #000;
+  margin-bottom: 10px;
 }
 #result {
-  font-size: 1.1rem;
-  font-weight: 900;
-  height: 28px;
+  font-size: 1rem;
+  font-weight: normal;
+  min-height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-shadow: 2px 2px 0 #000;
 }
-.correct { color: var(--green); }
-.wrong { color: var(--red); animation: shake 0.3s ease; }
+.correct { color: #80ee44; }
+.wrong { color: #ff4444; animation: mcshake 0.3s steps(3); }
 
 /* INPUT */
-.input-wrap { position: relative; margin-bottom: 10px; }
-.input-wrap input {
+.mc-input-wrap { margin-bottom: 8px; }
+.mc-input-wrap input {
   width: 100%;
-  padding: 14px 16px;
-  font-size: 1.2rem;
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-weight: 700;
-  background: #050d1a;
-  border: 2px solid #1e3a5f;
-  border-radius: 10px;
-  color: var(--green);
+  padding: 13px 14px;
+  font-size: 1.1rem;
+  font-family: 'DotGothic16', monospace;
+  background: #1a1a1a;
+  box-shadow:
+    inset -3px -3px 0 #333,
+    inset  3px  3px 0 #000;
+  border: none;
+  color: #80ee44;
   text-align: center;
   outline: none;
-  transition: border-color 0.2s;
+  text-shadow: 1px 1px 0 #000;
 }
-.input-wrap input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(79,195,247,0.1); }
-.input-wrap input.hidden { display: none; }
-
-/* GAME BUTTONS */
-.btn-attack {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(135deg, #0a4a7a, #0d6ebd);
-  color: #fff;
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 14px;
-  font-weight: 900;
-  cursor: pointer;
-  margin-bottom: 8px;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(13,110,189,0.4);
-  transition: all 0.15s;
-}
-.btn-attack:active { transform: scale(0.97); box-shadow: none; }
-.btn-next {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(135deg, #0a3a1a, #0d6e3a);
-  color: var(--green);
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 14px;
-  font-weight: 900;
-  cursor: pointer;
-  margin-bottom: 8px;
-  transition: all 0.15s;
-  display: none;
-}
-.btn-next:active { transform: scale(0.97); }
+.mc-input-wrap input::placeholder { color: #444; }
+.mc-input-wrap input.hidden { display: none; }
 
 /* SCORE BAR */
-.score-bar { display: flex; justify-content: space-between; align-items: center; }
-.score-display { font-family: 'Zen Dots', monospace; font-size: 11px; color: var(--gold); }
-.btn-retire { background: none; border: 1px solid #333; color: #555; font-size: 10px; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-family: 'M PLUS Rounded 1c', sans-serif; }
+.mc-score-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  padding: 6px 4px 0;
+}
+.mc-score-text { font-size: 13px; color: var(--mc-gold); text-shadow: 1px 1px 0 #000; }
 
-/* FLOAT SCORE */
-.float-score {
+/* FLOAT */
+.mc-float {
   position: absolute;
-  font-family: 'Zen Dots', monospace;
-  font-size: 1rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
   pointer-events: none;
-  animation: floatUp 1s ease forwards;
+  animation: mcfloat 0.8s steps(8) forwards;
   z-index: 100;
+  text-shadow: 2px 2px 0 #000;
 }
 
-/* ===== FINISH SCREEN ===== */
-.finish-hero {
+/* ==============================
+   FINISH SCREEN
+   ============================== */
+.mc-finish-hero {
+  background: #1a1a1a;
+  box-shadow:
+    inset -4px -4px 0 #000,
+    inset  4px  4px 0 #333,
+    0 4px 0 #000;
+  padding: 20px 12px;
   text-align: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #0d1b2a, #1a2744);
-  border-radius: 12px;
-  margin-bottom: 14px;
-  border: 1px solid #1e3a5f;
-  position: relative;
-  overflow: hidden;
+  margin-bottom: 8px;
 }
-.finish-hero::after {
-  content: '★';
-  position: absolute;
-  font-size: 8rem;
-  color: rgba(255,215,0,0.03);
-  right: -10px; bottom: -20px;
+.mc-finish-pct {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 2.6rem;
+  color: var(--mc-gold);
+  text-shadow: 4px 4px 0 #664400, 6px 6px 0 #000;
+  display: block;
+  margin-bottom: 6px;
 }
-.finish-percent {
-  font-family: 'Zen Dots', monospace;
-  font-size: 3rem;
-  color: var(--gold);
-  text-shadow: 0 0 30px rgba(255,215,0,0.5);
-  line-height: 1;
-}
-.finish-label { font-size: 10px; color: #888; letter-spacing: 2px; margin-top: 4px; margin-bottom: 12px; }
+.mc-finish-label { font-size: 12px; color: #888; text-shadow: 1px 1px 0 #000; display: block; margin-bottom: 8px; }
+.mc-finish-time { font-size: 13px; color: #aaa; text-shadow: 1px 1px 0 #000; }
 
-/* REWARDS */
-.rewards-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 14px 0; }
-.reward-box {
-  background: #050d1a;
-  border: 1px solid #1e3a5f;
-  border-radius: 8px;
+.mc-rewards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+.mc-reward-slot {
+  background: #8b8b8b;
+  box-shadow:
+    inset -3px -3px 0 #c6c6c6,
+    inset  3px  3px 0 #373737;
   padding: 10px 6px;
   text-align: center;
 }
-.reward-box .r-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
-.reward-box .r-label { font-size: 9px; color: #666; display: block; }
-.reward-box .r-value { font-family: 'Zen Dots', monospace; font-size: 0.95rem; color: var(--gold); display: block; }
-.reward-box.highlight { border-color: var(--gold); background: rgba(255,215,0,0.05); }
+.mc-reward-slot .r-icon { font-size: 1.2rem; display: block; margin-bottom: 4px; }
+.mc-reward-slot .r-label { font-size: 9px; color: #1a1a1a; text-shadow: 1px 1px 0 #c6c6c6; display: block; }
+.mc-reward-slot .r-value { font-family: 'Press Start 2P', monospace; font-size: 0.8rem; color: #fff; text-shadow: 1px 1px 0 #000; display: block; margin-top: 3px; }
 
-.wrong-list {
-  font-size: 11px;
-  color: var(--red);
+.mc-wrong-list {
+  font-size: 13px;
+  color: #ff6666;
   padding: 10px 12px;
-  background: rgba(255,71,87,0.05);
-  border: 1px solid rgba(255,71,87,0.2);
-  border-radius: 8px;
-  margin-bottom: 12px;
-  line-height: 1.8;
-}
-.wrong-list.all-clear { color: var(--green); border-color: rgba(105,240,174,0.3); background: rgba(105,240,174,0.05); }
-
-.btn-retry {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(135deg, #0a4a7a, #0d6ebd);
-  color: #fff;
-  font-family: 'M PLUS Rounded 1c', sans-serif;
-  font-size: 14px;
-  font-weight: 900;
-  cursor: pointer;
+  background: #2a0000;
+  box-shadow:
+    inset -3px -3px 0 #000,
+    inset  3px  3px 0 #4a0000;
   margin-bottom: 8px;
-  box-shadow: 0 4px 15px rgba(13,110,189,0.4);
+  line-height: 1.8;
+  text-shadow: 1px 1px 0 #000;
 }
-.btn-back { width: 100%; padding: 10px; background: #111; border: 1px solid #333; border-radius: 8px; color: #888; font-size: 12px; font-family: 'M PLUS Rounded 1c', sans-serif; cursor: pointer; }
+.mc-wrong-list.all-clear {
+  color: #80ee44;
+  background: #002a00;
+  box-shadow:
+    inset -3px -3px 0 #000,
+    inset  3px  3px 0 #004a00;
+}
 
-/* ===== LEVEL UP OVERLAY ===== */
+/* ==============================
+   LEVEL UP OVERLAY
+   ============================== */
 #levelUpOverlay {
   display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.88);
   z-index: 2000;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  align-items: center; justify-content: center;
 }
 #levelUpOverlay.show { display: flex; }
-.levelup-card {
-  background: linear-gradient(135deg, #1a0d3a, #2a1a5a);
-  border: 2px solid var(--purple);
-  border-radius: 20px;
-  padding: 32px 40px;
+.mc-levelup-card {
+  background: #2e6e6e;
+  box-shadow:
+    inset -6px -6px 0 #1a3e3e,
+    inset  6px  6px 0 #4de0d0,
+    0 6px 0 #000;
+  padding: 30px 36px;
   text-align: center;
-  animation: popIn 0.5s ease;
-  box-shadow: 0 0 60px rgba(206,147,216,0.4);
+  animation: mcpopin 0.3s steps(4) forwards;
+  max-width: 320px; width: 90%;
 }
-.levelup-title { font-family: 'Zen Dots', monospace; font-size: 1.1rem; color: var(--purple); letter-spacing: 3px; margin-bottom: 8px; }
-.levelup-lv { font-family: 'Zen Dots', monospace; font-size: 3rem; color: var(--gold); text-shadow: 0 0 30px var(--gold); }
-.levelup-name { font-size: 1.1rem; font-weight: 700; color: #fff; margin-top: 8px; }
-.levelup-close { margin-top: 20px; padding: 10px 30px; background: var(--purple); border: none; border-radius: 8px; color: #fff; font-family: 'M PLUS Rounded 1c', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+.mc-levelup-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.75rem;
+  color: #4de0d0;
+  text-shadow: 2px 2px 0 #000;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  display: block;
+}
+.mc-levelup-lv {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 2.5rem;
+  color: var(--mc-gold);
+  text-shadow: 4px 4px 0 #664400, 6px 6px 0 #000;
+  display: block;
+  margin-bottom: 8px;
+}
+.mc-levelup-name { font-size: 16px; color: #fff; text-shadow: 2px 2px 0 #000; display: block; margin-bottom: 20px; }
 
-/* ===== EXCHANGE OVERLAY ===== */
+/* ==============================
+   EXCHANGE OVERLAY
+   ============================== */
 #exchangeOverlay {
   display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.92);
   z-index: 1500;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  align-items: center; justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
 }
 #exchangeOverlay.show { display: flex; }
-.exchange-card {
-  background: #111827;
-  border: 1px solid var(--gold);
-  border-radius: 16px;
-  width: 100%;
-  max-width: 360px;
-  padding: 24px;
-  position: relative;
+.mc-exchange-card {
+  background: #c6c6c6;
+  box-shadow:
+    inset -4px -4px 0 #555,
+    inset  4px  4px 0 #fff,
+    0 4px 0 #000;
+  padding: 14px;
+  width: 100%; max-width: 380px;
 }
-.exchange-title { font-family: 'Zen Dots', monospace; font-size: 1rem; color: var(--gold); margin-bottom: 4px; }
-.exchange-pts { font-size: 11px; color: var(--green); margin-bottom: 16px; }
-.exchange-items { display: grid; gap: 8px; }
-.exchange-item {
-  background: #050d1a;
-  border: 1px solid #1e3a5f;
-  border-radius: 10px;
+.mc-exchange-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.75rem;
+  color: #1a1a1a;
+  text-shadow: 1px 1px 0 #fff;
+  margin-bottom: 4px;
+  display: block;
+}
+.mc-exchange-pts { font-size: 13px; color: #2a5a2a; text-shadow: 1px 1px 0 #aaddaa; margin-bottom: 10px; display: block; }
+.mc-exchange-items { display: grid; gap: 6px; }
+.mc-exchange-item {
+  background: #8b8b8b;
+  box-shadow:
+    inset -3px -3px 0 #c6c6c6,
+    inset  3px  3px 0 #373737;
   padding: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  transition: all 0.15s;
 }
-.exchange-item:active { background: #0a1628; border-color: var(--gold); }
-.exchange-item .ex-info {}
-.exchange-item .ex-name { font-size: 13px; font-weight: 700; color: #fff; }
-.exchange-item .ex-desc { font-size: 10px; color: #888; margin-top: 2px; }
-.exchange-item .ex-cost { font-family: 'Zen Dots', monospace; font-size: 1rem; color: var(--gold); white-space: nowrap; }
-.exchange-item .ex-unit { font-size: 9px; color: #888; }
-.exchange-close { width: 100%; margin-top: 12px; padding: 10px; background: #222; border: 1px solid #444; border-radius: 8px; color: #888; font-family: 'M PLUS Rounded 1c', sans-serif; cursor: pointer; }
+.mc-exchange-item:active {
+  box-shadow:
+    inset -1px -1px 0 #c6c6c6,
+    inset  1px  1px 0 #373737;
+  transform: translateY(2px);
+}
+.mc-exchange-item .ex-name { font-size: 14px; color: #fff; text-shadow: 1px 1px 0 #000; display: block; }
+.mc-exchange-item .ex-desc { font-size: 10px; color: #ccc; text-shadow: 1px 1px 0 #000; margin-top: 2px; display: block; }
+.mc-exchange-item .ex-cost { font-family: 'Press Start 2P', monospace; font-size: 0.8rem; color: var(--mc-gold); text-shadow: 1px 1px 0 #000; white-space: nowrap; }
+.mc-exchange-item .ex-unit { font-size: 9px; color: #aaa; text-align: right; }
 
-/* ===== STATS OVERLAY ===== */
+/* ==============================
+   STATS OVERLAY
+   ============================== */
 #statsOverlay {
   display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.92);
   z-index: 1500;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 20px;
+  align-items: flex-start; justify-content: center;
+  padding: 16px;
   overflow-y: auto;
 }
 #statsOverlay.show { display: flex; }
-.stats-card {
-  width: 100%;
-  max-width: 400px;
+.mc-stats-card {
+  background: #c6c6c6;
+  box-shadow:
+    inset -4px -4px 0 #555,
+    inset  4px  4px 0 #fff,
+    0 4px 0 #000;
+  padding: 14px;
+  width: 100%; max-width: 400px;
   margin: auto;
-  background: #111827;
-  border: 1px solid var(--green);
-  border-radius: 16px;
-  padding: 20px;
 }
-.stats-title { font-family: 'Zen Dots', monospace; font-size: 11px; color: var(--green); margin-bottom: 12px; letter-spacing: 2px; }
-.range-btns { display: flex; gap: 6px; margin-bottom: 14px; }
-.range-btn { flex: 1; padding: 8px; background: #050d1a; border: 1px solid #1e3a5f; border-radius: 6px; color: #888; font-size: 11px; font-family: 'M PLUS Rounded 1c', sans-serif; cursor: pointer; }
-.range-btn.active { background: rgba(105,240,174,0.1); border-color: var(--green); color: var(--green); }
-.stats-close { width: 100%; margin-top: 12px; padding: 10px; background: #222; border: 1px solid #444; border-radius: 8px; color: #888; font-family: 'M PLUS Rounded 1c', sans-serif; cursor: pointer; }
-.chart-label { font-size: 10px; color: #666; margin-bottom: 6px; margin-top: 14px; }
+.mc-stats-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: #1a1a1a;
+  text-shadow: 1px 1px 0 #fff;
+  margin-bottom: 10px;
+  display: block;
+}
+.mc-range-btns { display: flex; gap: 4px; margin-bottom: 10px; }
+.mc-range-btn {
+  flex: 1; padding: 8px 4px;
+  font-family: 'DotGothic16', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  text-shadow: 1px 1px 0 #000;
+  background: var(--mc-stone);
+  box-shadow:
+    inset -3px -3px 0 var(--mc-stone-s),
+    inset  3px  3px 0 var(--mc-stone-h),
+    0 3px 0 #000;
+}
+.mc-range-btn.active {
+  background: var(--mc-grass);
+  box-shadow:
+    inset -3px -3px 0 var(--mc-grass-s),
+    inset  3px  3px 0 var(--mc-grass-h),
+    0 3px 0 #000;
+}
+.mc-chart-label { font-size: 11px; color: #1a1a1a; text-shadow: 1px 1px 0 #c6c6c6; margin-bottom: 4px; margin-top: 12px; display: block; }
 
-/* ===== NOTIFICATION TOAST ===== */
+/* ==============================
+   TOAST
+   ============================== */
 #toast {
   position: fixed;
-  top: 20px;
-  left: 50%;
+  top: 16px; left: 50%;
   transform: translateX(-50%) translateY(-80px);
-  background: linear-gradient(135deg, #1a2744, #0d2244);
-  border: 1px solid var(--blue);
-  border-radius: 10px;
+  background: #1a1a1a;
+  box-shadow:
+    inset -3px -3px 0 #000,
+    inset  3px  3px 0 #444,
+    0 4px 0 #000;
   padding: 10px 20px;
-  font-size: 12px;
-  color: var(--blue);
+  font-size: 13px;
+  color: #80ee44;
+  text-shadow: 1px 1px 0 #000;
   z-index: 3000;
-  transition: transform 0.3s ease;
+  transition: transform 0.2s steps(4);
   white-space: nowrap;
-  text-align: center;
 }
 #toast.show { transform: translateX(-50%) translateY(0); }
 
-/* ===== BEST RECORDS ===== */
-.best-row { display: flex; flex-wrap: wrap; gap: 4px; }
-.best-chip {
-  background: #050d1a;
-  border: 1px solid #1e3a5f;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-family: 'Zen Dots', monospace;
-  font-size: 9px;
-  color: #888;
+/* ==============================
+   TIMER
+   ============================== */
+#playTime {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #444;
+  text-align: right;
+  margin-bottom: 6px;
+  text-shadow: 1px 1px 0 #000;
 }
-.best-chip.gold { border-color: rgba(255,215,0,0.4); color: var(--gold); }
-
-/* TIMER */
-.session-timer { font-family: 'Zen Dots', monospace; font-size: 9px; color: #444; text-align: right; margin-bottom: 8px; }
 </style>
 </head>
 <body>
 
-<!-- ===== MENU SCREEN ===== -->
+<!-- ===== MENU ===== -->
 <div class="screen active" id="menuScreen">
-  <div class="session-timer" id="playTime">00:00</div>
+  <div id="playTime">0:00</div>
+  <div class="mc-panel">
 
-  <div class="card">
-    <div class="game-title">PREF_MASTER</div>
-    <div class="game-subtitle">THE QUEST Ver 2.0</div>
+    <div class="mc-titlebar">
+      <span class="mc-title">PREF_MASTER</span>
+      <span class="mc-subtitle">THE QUEST Ver 2.0</span>
+    </div>
 
-    <!-- Player Card -->
-    <div class="player-card" id="playerCard">
-      <div class="player-header">
-        <div class="char-avatar" id="charAvatar" style="font-size:1rem; font-family:'M PLUS Rounded 1c',sans-serif; font-weight:900; color:#fff; letter-spacing:0;">Lv.1</div>
-        <div class="player-info">
-          <div class="player-name" id="playerNameDisplay">PLAYER</div>
-          <div class="player-title" id="playerTitleDisplay">🌱 ルーキー</div>
-          <div class="char-name" id="charNameDisplay">見習い探検家 Lv.1</div>
+    <!-- プレイヤーカード -->
+    <div class="mc-player-card">
+      <div class="mc-player-header">
+        <div class="mc-avatar" id="charAvatar">Lv.<br>1</div>
+        <div>
+          <div class="mc-player-name" id="playerNameDisplay">PLAYER</div>
+          <div class="mc-player-title" id="playerTitleDisplay">🌱 ルーキー</div>
+          <div class="mc-char-name" id="charNameDisplay">見習い探検家 Lv.1</div>
         </div>
       </div>
-      <div class="exp-section">
-        <div class="exp-label">
-          <span>EXP</span>
-          <span id="expLabel">0 / 100</span>
+      <div class="mc-exp-wrap">
+        <div class="mc-exp-label">
+          <span>EXP</span><span id="expLabel">0 / 100</span>
         </div>
-        <div class="exp-bar"><div class="exp-fill" id="expFill" style="width:0%"></div></div>
+        <div class="mc-exp-track"><div class="mc-exp-fill" id="expFill" style="width:0%"></div></div>
       </div>
-      <div class="point-row">
-        <div class="point-box">
-          <div class="label">TOTAL PTS</div>
-          <div class="value" id="totalPtsDisplay">0</div>
-          <div class="unit">points</div>
+      <div class="mc-slots">
+        <div class="mc-slot">
+          <span class="mc-slot-label">TOTAL PTS</span>
+          <span class="mc-slot-value" id="totalPtsDisplay">0</span>
+          <span class="mc-slot-unit">points</span>
         </div>
-        <div class="point-box available">
-          <div class="label">USE可能</div>
-          <div class="value" id="availPtsDisplay">0</div>
-          <div class="unit">points</div>
+        <div class="mc-slot">
+          <span class="mc-slot-label">USE可能</span>
+          <span class="mc-slot-value green" id="availPtsDisplay">0</span>
+          <span class="mc-slot-unit">points</span>
         </div>
-        <div class="point-box">
-          <div class="label">MAX COMBO</div>
-          <div class="value" id="maxComboDisplay">0</div>
-          <div class="unit">chain</div>
+        <div class="mc-slot">
+          <span class="mc-slot-label">MAX COMBO</span>
+          <span class="mc-slot-value" id="maxComboDisplay">0</span>
+          <span class="mc-slot-unit">chain</span>
         </div>
       </div>
     </div>
 
-    <!-- Best Records -->
-    <div style="margin-bottom:12px;">
-      <div style="font-size:9px;color:#555;letter-spacing:2px;margin-bottom:6px;">BEST RECORDS</div>
-      <div class="best-row" id="bestRow"></div>
+    <!-- BEST RECORDS -->
+    <div class="mc-best-wrap">
+      <div class="mc-best-label">[ BEST RECORDS ]</div>
+      <div class="mc-best-row" id="bestRow"></div>
     </div>
 
-    <!-- Level Buttons -->
-    <div class="level-grid">
-      <button class="level-btn" onclick="startGame(1)">
-        <span class="lv-badge">LV.1</span>
+    <!-- LEVEL SELECT -->
+    <div class="mc-level-grid">
+      <button class="mc-level-btn" onclick="startGame(1)">
+        <span class="lv-no">LV.1</span>
         <span class="lv-name">東日本</span>
-        <span class="lv-pts">全問正解で +1 pt</span>
+        <span class="lv-pt">全問正解 +1pt</span>
       </button>
-      <button class="level-btn" onclick="startGame(2)">
-        <span class="lv-badge">LV.2</span>
+      <button class="mc-level-btn" onclick="startGame(2)">
+        <span class="lv-no">LV.2</span>
         <span class="lv-name">西日本</span>
-        <span class="lv-pts">全問正解で +2 pt</span>
+        <span class="lv-pt">全問正解 +2pt</span>
       </button>
-      <button class="level-btn" onclick="startGame(3)">
-        <span class="lv-badge">LV.3</span>
-        <span class="lv-name">全国版</span>
-        <span class="lv-pts">全問正解で +3 pt</span>
-      </button>
-      <button class="level-btn" onclick="startGame(4)">
-        <span class="lv-badge">LV.4</span>
+      <button class="mc-level-btn" onclick="startGame(3)">
+        <span class="lv-no">LV.3</span>
         <span class="lv-name">視覚：東</span>
-        <span class="lv-pts">全問正解で +4 pt</span>
+        <span class="lv-pt">全問正解 +3pt</span>
       </button>
-      <button class="level-btn" onclick="startGame(5)">
-        <span class="lv-badge">LV.5</span>
+      <button class="mc-level-btn" onclick="startGame(4)">
+        <span class="lv-no">LV.4</span>
         <span class="lv-name">視覚：西</span>
-        <span class="lv-pts">全問正解で +5 pt</span>
+        <span class="lv-pt">全問正解 +4pt</span>
       </button>
-      <button class="level-btn ultimate" onclick="startGame(6)">
-        <span class="lv-badge">LV.MAX</span>
+      <button class="mc-level-btn ultimate" onclick="startGame(5)">
+        <span class="lv-no">LV.MAX</span>
         <span class="lv-name">⚡ 究極モード</span>
-        <span class="lv-pts">全問正解で +10 pt</span>
+        <span class="lv-pt">全問正解 +10pt</span>
       </button>
-      <button class="level-btn revive-btn" onclick="startGame('revive')">
-        <span class="lv-badge">SPECIAL</span>
-        <span class="lv-name">🔁 リベンジ（今日のミス）</span>
-        <span class="lv-pts">雪辱を果たせ</span>
+      <button class="mc-level-btn revive" onclick="startGame('revive')">
+        <span class="lv-no">SPECIAL</span>
+        <span class="lv-name">🔁 リベンジ</span>
+        <span class="lv-pt">今日のミスを雪辱</span>
       </button>
     </div>
 
-    <button class="action-btn btn-stats" onclick="openStats()">📊 過去の戦績データ</button>
-    <button class="action-btn btn-exchange" onclick="openExchange()">🎁 ポイント → お小遣い交換</button>
+    <button class="mc-btn mc-btn-green" onclick="openStats()">📊 過去の戦績データ</button>
+    <button class="mc-btn mc-btn-gold" onclick="openExchange()">🎁 ポイント → お小遣い交換</button>
+    <button class="mc-btn mc-btn-dark" id="syncBtn" onclick="syncWithGAS()">🔄 スプシと同期</button>
   </div>
 </div>
 
-<!-- ===== GAME SCREEN ===== -->
+<!-- ===== GAME ===== -->
 <div class="screen" id="gameScreen">
-  <div class="card">
-    <div class="game-header">
-      <span class="level-tag" id="gameLevelTag">LV.1</span>
-      <span class="remain-tag">残り <span id="remaining">0</span> 問</span>
+  <div class="mc-panel">
+    <div class="mc-game-header">
+      <span class="mc-lv-tag" id="gameLevelTag">LV.1</span>
+      <span class="mc-remain">残り <span id="remaining">0</span> 問</span>
     </div>
 
-    <!-- Combo -->
-    <div class="combo-area">
-      <div class="combo-badge" id="comboBadge"></div>
+    <div class="mc-combo-area">
+      <div class="mc-combo-badge" id="comboBadge"></div>
     </div>
 
-    <!-- Battle Zone -->
-    <div class="battle-zone" id="battleZone">
+    <div class="mc-battle" id="battleZone">
       <div id="prefName"></div>
       <img id="prefImage" style="display:none;">
       <div id="result"></div>
     </div>
 
-    <!-- Input -->
-    <div class="input-wrap">
-      <input id="capitalAnswer" placeholder="所在地名を入力せよ" autocomplete="off">
-      <input id="prefAnswer" class="hidden" placeholder="県名を名乗れ" autocomplete="off">
+    <div class="mc-input-wrap">
+      <input id="capitalAnswer" placeholder="県庁所在地を入力" autocomplete="off" spellcheck="false">
+      <input id="prefAnswer" class="hidden" placeholder="県名" autocomplete="off">
     </div>
 
-    <button class="btn-attack" id="ansBtn" onclick="checkAnswer()">⚔️ 攻撃！</button>
-    <button class="btn-next" id="nextBtn" onclick="nextQuestion()">▶ 次の敵へ</button>
+    <button class="mc-btn mc-btn-diamond" id="ansBtn" onclick="checkAnswer()">⚔ 攻撃！</button>
+    <button class="mc-btn mc-btn-green" id="nextBtn" style="display:none;" onclick="nextQuestion()">▶ 次の敵へ</button>
 
-    <div class="score-bar">
-      <div class="score-display">SCORE: <span id="score">0</span> / <span id="totalQ">0</span> ｜ ミス: <span id="missCount">0</span>問</div>
-      <button class="btn-retire" onclick="backToMenu()">リタイア</button>
+    <div class="mc-score-bar">
+      <span class="mc-score-text">✅ <span id="score">0</span>/<span id="totalQ">0</span>　❌ <span id="missCount">0</span>問</span>
+      <button class="mc-btn mc-btn-dark" style="width:auto;padding:6px 14px;margin:0;font-size:12px;" onclick="backToMenu()">リタイア</button>
     </div>
   </div>
 </div>
 
-<!-- ===== FINISH SCREEN ===== -->
+<!-- ===== FINISH ===== -->
 <div class="screen" id="finishScreen">
-  <div class="card">
-    <div class="finish-hero">
-      <div class="finish-percent" id="finishPercent">0%</div>
-      <div class="finish-label">QUEST COMPLETE</div>
-      <div id="finishTime" style="font-size:11px;color:#888;"></div>
+  <div class="mc-panel">
+    <div class="mc-finish-hero">
+      <span class="mc-finish-pct" id="finishPercent">0%</span>
+      <span class="mc-finish-label">QUEST COMPLETE</span>
+      <span class="mc-finish-time" id="finishTime"></span>
     </div>
 
-    <div class="rewards-grid" id="rewardsGrid">
-      <div class="reward-box">
+    <div class="mc-rewards">
+      <div class="mc-reward-slot">
         <span class="r-icon">⭐</span>
         <span class="r-label">POINTS</span>
         <span class="r-value" id="r-pts">0</span>
       </div>
-      <div class="reward-box">
+      <div class="mc-reward-slot">
         <span class="r-icon">📈</span>
         <span class="r-label">EXP</span>
         <span class="r-value" id="r-exp">0</span>
       </div>
-      <div class="reward-box">
+      <div class="mc-reward-slot">
         <span class="r-icon">🔥</span>
-        <span class="r-label">MAX COMBO</span>
+        <span class="r-label">COMBO</span>
         <span class="r-value" id="r-combo">0</span>
       </div>
     </div>
 
-    <div class="wrong-list" id="wrongList"></div>
+    <div class="mc-wrong-list" id="wrongList"></div>
 
-    <button class="btn-retry" onclick="restartSameLevel()">🔄 再挑戦（RETRY）</button>
-    <button class="btn-back" onclick="backToMenu()">本部へ戻る</button>
+    <button class="mc-btn mc-btn-diamond" onclick="restartSameLevel()">🔄 再挑戦（RETRY）</button>
+    <button class="mc-btn mc-btn-dark" onclick="backToMenu()">🏠 本部へ戻る</button>
   </div>
 </div>
 
-<!-- ===== OVERLAYS ===== -->
-
-<!-- Level Up -->
+<!-- ===== LEVEL UP OVERLAY ===== -->
 <div id="levelUpOverlay">
-  <div class="levelup-card">
-    <div class="levelup-title">LEVEL UP !</div>
-    <div class="levelup-lv" id="levelUpLv">Lv.2</div>
-    <div class="levelup-name" id="levelUpName">旅人</div>
-    <button class="levelup-close" onclick="closeLevelUp()">やったー！</button>
+  <div class="mc-levelup-card">
+    <span class="mc-levelup-title">LEVEL  UP !</span>
+    <span class="mc-levelup-lv" id="levelUpLv">Lv.2</span>
+    <span class="mc-levelup-name" id="levelUpName">旅人</span>
+    <button class="mc-btn mc-btn-green" style="margin-top:4px;" onclick="closeLevelUp()">やったー！</button>
   </div>
 </div>
 
-<!-- Exchange -->
+<!-- ===== EXCHANGE OVERLAY ===== -->
 <div id="exchangeOverlay">
-  <div class="exchange-card">
-    <div class="exchange-title">🎁 ポイント交換所</div>
-    <div class="exchange-pts">使えるポイント: <span id="exchAvailPts" style="color:var(--gold);font-weight:700;">0</span> pts</div>
-    <div class="exchange-items">
-      <div class="exchange-item" onclick="doExchange(50,'10円おこづかい')">
-        <div class="ex-info">
-          <div class="ex-name">💴 10円おこづかい</div>
-          <div class="ex-desc">がんばった分だけもらおう</div>
-        </div>
-        <div><div class="ex-cost">50</div><div class="ex-unit">pts</div></div>
+  <div class="mc-exchange-card">
+    <span class="mc-exchange-title">[ ポイント交換所 ]</span>
+    <span class="mc-exchange-pts">使えるポイント: <b id="exchAvailPts">0</b> pts</span>
+    <div class="mc-exchange-items">
+      <div class="mc-exchange-item" onclick="doExchange(50,'10円おこづかい')">
+        <div><span class="ex-name">💴 10円おこづかい</span><span class="ex-desc">がんばった分だけもらおう</span></div>
+        <div><span class="ex-cost">50</span><span class="ex-unit">pts</span></div>
       </div>
-      <div class="exchange-item" onclick="doExchange(200,'50円おこづかい')">
-        <div class="ex-info">
-          <div class="ex-name">💰 50円おこづかい</div>
-          <div class="ex-desc">コツコツためるとお得！</div>
-        </div>
-        <div><div class="ex-cost">200</div><div class="ex-unit">pts</div></div>
+      <div class="mc-exchange-item" onclick="doExchange(200,'50円おこづかい')">
+        <div><span class="ex-name">💰 50円おこづかい</span><span class="ex-desc">コツコツためるとお得！</span></div>
+        <div><span class="ex-cost">200</span><span class="ex-unit">pts</span></div>
       </div>
-      <div class="exchange-item" onclick="doExchange(500,'100円おこづかい')">
-        <div class="ex-info">
-          <div class="ex-name">🪙 100円おこづかい</div>
-          <div class="ex-desc">よくがんばった証</div>
-        </div>
-        <div><div class="ex-cost">500</div><div class="ex-unit">pts</div></div>
+      <div class="mc-exchange-item" onclick="doExchange(500,'100円おこづかい')">
+        <div><span class="ex-name">🪙 100円おこづかい</span><span class="ex-desc">よくがんばった証</span></div>
+        <div><span class="ex-cost">500</span><span class="ex-unit">pts</span></div>
       </div>
-      <div class="exchange-item" onclick="doExchange(2000,'500円おこづかい')">
-        <div class="ex-info">
-          <div class="ex-name">👑 500円おこづかい</div>
-          <div class="ex-desc">伝説クラスの達成！</div>
-        </div>
-        <div><div class="ex-cost">2000</div><div class="ex-unit">pts</div></div>
+      <div class="mc-exchange-item" onclick="doExchange(2000,'500円おこづかい')">
+        <div><span class="ex-name">👑 500円おこづかい</span><span class="ex-desc">伝説クラスの達成！</span></div>
+        <div><span class="ex-cost">2000</span><span class="ex-unit">pts</span></div>
       </div>
     </div>
-    <button class="exchange-close" onclick="closeExchange()">とじる</button>
+    <button class="mc-btn mc-btn-dark" style="margin-top:8px;" onclick="closeExchange()">とじる</button>
   </div>
 </div>
 
-<!-- Stats -->
+<!-- ===== STATS OVERLAY ===== -->
 <div id="statsOverlay">
-  <div class="stats-card">
-    <div class="stats-title">DATA ANALYZE</div>
-    <div class="range-btns">
-      <button class="range-btn active" onclick="updateRange('day',this)">日次</button>
-      <button class="range-btn" onclick="updateRange('month',this)">月次</button>
-      <button class="range-btn" onclick="updateRange('all',this)">全期間</button>
+  <div class="mc-stats-card">
+    <span class="mc-stats-title">[ DATA ANALYZE ]</span>
+    <div id="statsLoading" style="text-align:center;padding:20px;font-size:13px;color:#555;">読み込み中...</div>
+    <div id="statsContent" style="display:none;">
+      <!-- レベルタブ -->
+      <div style="margin-bottom:8px;">
+        <div class="mc-best-label" style="margin-bottom:6px;">LEVEL</div>
+        <div class="mc-range-btns" id="lvTabBtns">
+          <button class="mc-range-btn active" onclick="updateLvTab('1',this)">LV1</button>
+          <button class="mc-range-btn" onclick="updateLvTab('2',this)">LV2</button>
+          <button class="mc-range-btn" onclick="updateLvTab('3',this)">LV3</button>
+          <button class="mc-range-btn" onclick="updateLvTab('4',this)">LV4</button>
+          <button class="mc-range-btn" onclick="updateLvTab('5',this)">LV5</button>
+        </div>
+      </div>
+      <!-- 期間タブ -->
+      <div style="margin-bottom:10px;">
+        <div class="mc-best-label" style="margin-bottom:6px;">PERIOD</div>
+        <div class="mc-range-btns">
+          <button class="mc-range-btn active" onclick="updateRange('day',this)">日次</button>
+          <button class="mc-range-btn" onclick="updateRange('month',this)">月次</button>
+          <button class="mc-range-btn" onclick="updateRange('all',this)">全期間</button>
+        </div>
+      </div>
+      <span class="mc-chart-label">正解率 (%)</span>
+      <canvas id="scoreChart"></canvas>
+      <span class="mc-chart-label">タイム (秒)</span>
+      <canvas id="timeChart"></canvas>
+      <!-- ベストレコード（GASから計算） -->
+      <div style="margin-top:12px;">
+        <div class="mc-best-label">[ BEST RECORDS from スプシ ]</div>
+        <div id="gasBestRow" class="mc-best-row" style="margin-top:6px;"></div>
+      </div>
     </div>
-    <div class="chart-label">正解率 (%)</div>
-    <canvas id="scoreChart"></canvas>
-    <div class="chart-label">タイム (秒)</div>
-    <canvas id="timeChart"></canvas>
-    <button class="stats-close" onclick="closeStats()">とじる</button>
+    <button class="mc-btn mc-btn-dark" style="margin-top:10px;" onclick="closeStats()">とじる</button>
   </div>
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
 <script>
 // ===========================
-// DATA
+// CONFIG
 // ===========================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyZJ27xaP6QNkCBS0Ucj4NLi9_KHyXmtBrEZW9LWssCAc6N1gKQaQ_e4w90taLEnYif3Q/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzxFUSzbL0dgkkjwr_IiFAiuLscQPFN70qOyK8OnQQbqm_j2eyXFBurTjK5LBsY-doCxQ/exec";
 const PLAYER_NAME = "夏向";
+
+// LV1,2 → 画像＋県名表示（県庁所在地を答える）
+// LV3,4 → 画像のみ（県名も県庁所在地も答える）
+// LV5(MAX) → 全国・画像のみ
+// ※LV3=旧LV4視覚東、LV4=旧LV5視覚西、LV5=旧LV6究極
+
+const POINT_TABLE  = { 1:1, 2:2, 3:3, 4:4, 5:10, revive:1 };
+const EXP_TABLE    = { 1:5, 2:8, 3:12, 4:15, 5:30, revive:5 };
 
 const eastJapan = [
   {name:"北海道",capital:"札幌市",file:"hokkaido.png"},{name:"青森県",capital:"青森市",file:"aomori.png"},
@@ -836,28 +1080,17 @@ const westJapan = [
 const allJapan = eastJapan.concat(westJapan);
 
 // ===========================
-// POINT CONFIG
-// ===========================
-// 全問正解時のみ付与するポイント（レベル別）
-const POINT_TABLE = {
-  1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 10, revive: 1
-};
-const EXP_TABLE = {
-  1: 5, 2: 8, 3: 10, 4: 12, 5: 15, 6: 30, revive: 5
-};
-
-// ===========================
 // STATE
 // ===========================
 let state = {
-  currentList: [], current: null, score: 0, levelMode: 1,
-  totalQuestions: 0, gameStartTime: 0, sessionWrongNames: [],
-  combo: 0, maxCombo: 0, ptsEarned: 0, expEarned: 0,
+  currentList:[], current:null, score:0, levelMode:1,
+  totalQuestions:0, gameStartTime:0, sessionWrongNames:[],
+  combo:0, maxCombo:0, ptsEarned:0, expEarned:0,
 };
 let playerData = {
-  totalPoints: 0, spentPoints: 0, totalExp: 0,
-  charLevel: 1, charName: '見習い探検家', title: '🌱 ルーキー',
-  maxCombo: 0, totalGames: 0, availablePoints: 0,
+  totalPoints:0, spentPoints:0, totalExp:0,
+  charLevel:1, charName:'見習い探検家', title:'🌱 ルーキー',
+  maxCombo:0, totalGames:0, availablePoints:0,
 };
 let sessionStartTime = Date.now();
 let rawChartData = [];
@@ -866,16 +1099,12 @@ let currentRange = 'day';
 // ===========================
 // CHAR DATA
 // ===========================
-const CHAR_AVATARS = ['🗾','🌏','🗺️','⚔️','🛡️','🌟','👑','🔥','💎','🏆'];
-const CHAR_NAMES = [
-  '','見習い探検家','地図職人','旅人','冒険者','勇者',
+const CHAR_NAMES = ['','見習い探検家','地図職人','旅人','冒険者','勇者',
   '猛者','地理の達人','都市の案内人','知恵の戦士','伝説の地理士',
-  '大陸の覇者','全国制覇者','地図の神','都道府県マスター','伝説の探求者'
-];
+  '大陸の覇者','全国制覇者','地図の神','都道府県マスター','伝説の探求者'];
 
-function calcLevel(exp) { return Math.min(15, Math.floor(exp / 100) + 1); }
-function getCharAvatar(level) { return CHAR_AVATARS[Math.min(level - 1, CHAR_AVATARS.length - 1)]; }
-function getCharName(level) { return CHAR_NAMES[Math.min(level, CHAR_NAMES.length - 1)] || '伝説の探求者'; }
+function calcLevel(exp) { return Math.min(15, Math.floor(exp/100)+1); }
+function getCharName(lv) { return CHAR_NAMES[Math.min(lv, CHAR_NAMES.length-1)] || '伝説の探求者'; }
 
 // ===========================
 // UI HELPERS
@@ -885,36 +1114,36 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
-function showToast(msg, duration = 2500) {
+function showToast(msg, dur=2500) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), duration);
+  setTimeout(()=>t.classList.remove('show'), dur);
 }
 
 function updatePlayerUI() {
   const lv = calcLevel(playerData.totalExp);
   const expInLevel = playerData.totalExp % 100;
-  const charName = getCharName(lv);
-  document.getElementById('charAvatar').textContent = 'Lv.' + lv;
-  document.getElementById('playerNameDisplay').textContent = PLAYER_NAME.toUpperCase();
+  document.getElementById('charAvatar').textContent = `Lv.\n${lv}`;
+  document.getElementById('playerNameDisplay').textContent = PLAYER_NAME;
   document.getElementById('playerTitleDisplay').textContent = playerData.title || '🌱 ルーキー';
-  document.getElementById('charNameDisplay').textContent = `${charName} Lv.${lv}`;
+  document.getElementById('charNameDisplay').textContent = `${getCharName(lv)} Lv.${lv}`;
   document.getElementById('expFill').style.width = expInLevel + '%';
   document.getElementById('expLabel').textContent = `${expInLevel} / 100`;
   document.getElementById('totalPtsDisplay').textContent = playerData.totalPoints || 0;
-  document.getElementById('availPtsDisplay').textContent = (playerData.totalPoints || 0) - (playerData.spentPoints || 0);
+  document.getElementById('availPtsDisplay').textContent = (playerData.totalPoints||0)-(playerData.spentPoints||0);
   document.getElementById('maxComboDisplay').textContent = playerData.maxCombo || 0;
 }
 
 function displayBest() {
   const row = document.getElementById('bestRow');
   row.innerHTML = '';
-  for (let i = 1; i <= 6; i++) {
-    const p = localStorage.getItem('best_p_' + i) || 0;
-    const t = localStorage.getItem('best_t_' + i) || '-';
+  // LV1〜5 + revive は別管理なのでスキップ
+  for (let i=1; i<=5; i++) {
+    const p = localStorage.getItem('best_p_'+i) || 0;
+    const t = localStorage.getItem('best_t_'+i) || '-';
     const chip = document.createElement('div');
-    chip.className = 'best-chip' + (p >= 100 ? ' gold' : '');
+    chip.className = 'mc-chip' + (p>=100?' gold':'');
     chip.textContent = `LV${i}: ${p}%(${t}s)`;
     row.appendChild(chip);
   }
@@ -925,30 +1154,28 @@ function displayBest() {
 // ===========================
 function startGame(level) {
   state.levelMode = level;
-  state.score = 0;
-  state.combo = 0;
-  state.maxCombo = 0;
-  state.ptsEarned = 0;
-  state.expEarned = 0;
+  state.score = 0; state.combo = 0; state.maxCombo = 0;
+  state.ptsEarned = 0; state.expEarned = 0;
   state.sessionWrongNames = [];
   state.gameStartTime = Date.now();
 
   if (level === 'revive') {
-    const targets = JSON.parse(localStorage.getItem('today_wrong') || '[]');
+    const targets = JSON.parse(localStorage.getItem('today_wrong')||'[]');
     if (targets.length === 0) { showToast('リベンジ対象がいません！'); return; }
     state.currentList = allJapan.filter(p => targets.includes(p.name));
-    localStorage.setItem('today_wrong', '[]');
   } else {
-    if (level == 1 || level == 4) state.currentList = [...eastJapan];
-    else if (level == 2 || level == 5) state.currentList = [...westJapan];
+    // LV1=東日本, LV2=西日本, LV3=視覚東, LV4=視覚西, LV5=全国
+    if (level==1||level==3) state.currentList = [...eastJapan];
+    else if (level==2||level==4) state.currentList = [...westJapan];
     else state.currentList = [...allJapan];
   }
   state.totalQuestions = state.currentList.length;
 
-  const levelNames = { 1:'LV.1 東日本', 2:'LV.2 西日本', 3:'LV.3 全国版', 4:'LV.4 視覚:東', 5:'LV.5 視覚:西', 6:'LV.MAX 究極', revive:'REVIVE' };
-  document.getElementById('gameLevelTag').textContent = levelNames[level] || level;
+  const names = {1:'LV.1 東日本',2:'LV.2 西日本',3:'LV.3 視覚:東',4:'LV.4 視覚:西',5:'LV.MAX 究極',revive:'REVIVE'};
+  document.getElementById('gameLevelTag').textContent = names[level] || level;
   document.getElementById('totalQ').textContent = state.totalQuestions;
   document.getElementById('score').textContent = 0;
+  document.getElementById('missCount').textContent = 0;
 
   showScreen('gameScreen');
   nextQuestion();
@@ -959,19 +1186,20 @@ function nextQuestion() {
   document.getElementById('nextBtn').style.display = 'none';
   document.getElementById('ansBtn').style.display = 'block';
 
-  const index = Math.floor(Math.random() * state.currentList.length);
-  state.current = state.currentList.splice(index, 1)[0];
+  const idx = Math.floor(Math.random()*state.currentList.length);
+  state.current = state.currentList.splice(idx,1)[0];
 
-  const showName = (state.levelMode <= 3 || state.levelMode === 'revive');
-  document.getElementById('prefName').textContent = showName ? state.current.name : '？';
-
+  const lv = state.levelMode;
   const img = document.getElementById('prefImage');
-  if (state.levelMode >= 4 || state.levelMode === 6) {
-    img.src = state.current.file;
-    img.style.display = '';
-  } else {
-    img.style.display = 'none';
-  }
+
+  // LV1,2 → 画像＋県名を表示（県庁所在地を答えさせる）
+  // LV3,4,5,revive → 画像のみ（県名は「？」）
+  const showName = (lv==1 || lv==2);
+  const showImg  = (lv!=1 && lv!=2) || true; // LV1,2も画像を表示
+
+  document.getElementById('prefName').textContent = showName ? state.current.name : '？';
+  img.src = state.current.file;
+  img.style.display = '';
 
   document.getElementById('capitalAnswer').value = '';
   document.getElementById('prefAnswer').value = '';
@@ -982,14 +1210,12 @@ function nextQuestion() {
   updateComboUI();
 }
 
-// ポイントは全問正解時のみfinishGameで付与
-
 function checkAnswer() {
-  const cap = document.getElementById('capitalAnswer').value.trim().replace(/[市区]$/, '');
-  const targetCap = state.current.capital.replace(/[市区]$/, '');
-  const correct = (cap === targetCap);
+  const cap = document.getElementById('capitalAnswer').value.trim().replace(/[市区]$/,'');
+  const tgt = state.current.capital.replace(/[市区]$/,'');
+  const ok  = (cap === tgt);
 
-  if (correct) {
+  if (ok) {
     state.score++;
     state.combo++;
     if (state.combo > state.maxCombo) state.maxCombo = state.combo;
@@ -1002,8 +1228,6 @@ function checkAnswer() {
     state.sessionWrongNames.push(state.current.name);
     document.getElementById('result').innerHTML = `❌ 正解: ${state.current.capital}`;
     document.getElementById('result').className = 'wrong';
-    document.getElementById('battleZone').style.animation = 'none';
-    setTimeout(() => document.getElementById('battleZone').style.animation = '', 50);
     document.getElementById('missCount').textContent = state.sessionWrongNames.length;
     updateComboUI();
   }
@@ -1013,45 +1237,31 @@ function checkAnswer() {
 }
 
 function updateComboUI() {
-  const badge = document.getElementById('comboBadge');
+  const b = document.getElementById('comboBadge');
   if (state.combo >= 3) {
-    badge.textContent = state.combo + ' COMBO!';
-    badge.classList.add('show');
-    badge.classList.toggle('mega', state.combo >= 10);
+    b.textContent = state.combo + ' COMBO!';
+    b.classList.add('show');
+    b.classList.toggle('mega', state.combo >= 10);
   } else {
-    badge.classList.remove('show', 'mega');
+    b.classList.remove('show','mega');
   }
-}
-
-function spawnFloat(text, color) {
-  const zone = document.getElementById('battleZone');
-  const el = document.createElement('div');
-  el.className = 'float-score';
-  el.textContent = text;
-  el.style.color = color;
-  el.style.top = (20 + Math.random() * 30) + 'px';
-  el.style.left = (20 + Math.random() * 60) + '%';
-  zone.appendChild(el);
-  setTimeout(() => el.remove(), 1000);
 }
 
 // ===========================
 // FINISH
 // ===========================
 async function finishGame() {
-  const clearTime = Math.floor((Date.now() - state.gameStartTime) / 1000);
-  const percent = Math.round((state.score / state.totalQuestions) * 100);
-  const level = state.levelMode;
+  const clearTime = Math.floor((Date.now()-state.gameStartTime)/1000);
+  const percent   = Math.round((state.score/state.totalQuestions)*100);
+  const level     = state.levelMode;
 
-  // DOM
   showScreen('finishScreen');
   document.getElementById('finishPercent').textContent = percent + '%';
   document.getElementById('finishTime').textContent = `${state.score}/${state.totalQuestions} 正解  |  ${clearTime}秒`;
-  // ポイントの仮計算（全問正解時のみ。1日1回チェックはGAS側で実施）
-  state.ptsEarned = percent === 100 ? (POINT_TABLE[level] || 1) : 0;
-  state.expEarned = percent === 100 ? (EXP_TABLE[level] || 5) : 0;
 
-  // 表示は仮で出しておく（GAS応答後に更新）
+  state.ptsEarned = percent===100 ? (POINT_TABLE[level]||1) : 0;
+  state.expEarned = percent===100 ? (EXP_TABLE[level]||5)   : 0;
+
   document.getElementById('r-pts').textContent = '...';
   document.getElementById('r-exp').textContent = '...';
   document.getElementById('r-combo').textContent = state.maxCombo;
@@ -1059,61 +1269,51 @@ async function finishGame() {
   const wrongEl = document.getElementById('wrongList');
   if (state.sessionWrongNames.length > 0) {
     wrongEl.textContent = '未達成: ' + state.sessionWrongNames.join('、');
-    wrongEl.className = 'wrong-list';
+    wrongEl.className = 'mc-wrong-list';
   } else {
     wrongEl.textContent = '🌟 ALL CLEAR!';
-    wrongEl.className = 'wrong-list all-clear';
+    wrongEl.className = 'mc-wrong-list all-clear';
   }
 
-  // LocalStorage（ベスト記録・リベンジ用）
-  const todayWrong = JSON.parse(localStorage.getItem('today_wrong') || '[]');
-  localStorage.setItem('today_wrong', JSON.stringify([...new Set([...todayWrong, ...state.sessionWrongNames])]));
-  if (percent > (localStorage.getItem('best_p_' + level) || 0)) localStorage.setItem('best_p_' + level, percent);
-  if (percent === 100 && clearTime < (localStorage.getItem('best_t_' + level) || 9999)) localStorage.setItem('best_t_' + level, clearTime);
+  // localStorage
+  if (level === 'revive') {
+    localStorage.setItem('today_wrong', JSON.stringify([...new Set(state.sessionWrongNames)]));
+  } else {
+    const tw = JSON.parse(localStorage.getItem('today_wrong')||'[]');
+    localStorage.setItem('today_wrong', JSON.stringify([...new Set([...tw, ...state.sessionWrongNames])]));
+  }
+  if (percent > (localStorage.getItem('best_p_'+level)||0)) localStorage.setItem('best_p_'+level, percent);
+  if (percent===100 && clearTime < (localStorage.getItem('best_t_'+level)||9999)) localStorage.setItem('best_t_'+level, clearTime);
 
-  // GAS: 記録保存＋1日1回チェック＋プレイヤーデータ更新はサーバー側で完結
+  // GAS
   try {
     const prevLv = calcLevel(playerData.totalExp);
     const body = {
-      action: 'saveRecord',
-      player: PLAYER_NAME,
-      level: level,
-      score: state.score,
-      percent: percent,
-      time: clearTime,
-      combo: state.maxCombo,
-      wrongPrefs: state.sessionWrongNames.join(','),
-      pointsEarned: state.ptsEarned,
-      expEarned: state.expEarned,
+      action:'saveRecord', player:PLAYER_NAME, level, score:state.score,
+      percent, time:clearTime, combo:state.maxCombo,
+      wrongPrefs:state.sessionWrongNames.join(','),
+      pointsEarned:state.ptsEarned, expEarned:state.expEarned,
     };
-    // no-corsでPOST後、GETで確定データを取得
-    await fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(body) });
-    await new Promise(r => setTimeout(r, 1200));
-    const res2 = await fetch(GAS_URL + '?action=getPlayer&player=' + encodeURIComponent(PLAYER_NAME));
-    const data = await res2.json();
+    await fetch(GAS_URL, {method:'POST', mode:'no-cors', body:JSON.stringify(body)});
+    await new Promise(r=>setTimeout(r,1200));
+    const res = await fetch(GAS_URL+'?action=getPlayer&player='+encodeURIComponent(PLAYER_NAME));
+    const data = await res.json();
     if (data && !data.error) {
-      // GASが実際に付与したポイントで表示を更新
-      const actualPts = data.pointsActuallyEarned ?? state.ptsEarned;
       const alreadyEarned = data.alreadyEarned || false;
-      document.getElementById('r-pts').textContent = alreadyEarned
-        ? '0（本日取得済み）'
-        : actualPts;
-      document.getElementById('r-exp').textContent = alreadyEarned
-        ? '0（本日取得済み）'
-        : (data.totalExp - playerData.totalExp > 0 ? data.totalExp - playerData.totalExp : state.expEarned);
+      document.getElementById('r-pts').textContent = alreadyEarned ? '0（本日取得済み）' : (data.pointsActuallyEarned ?? state.ptsEarned);
+      document.getElementById('r-exp').textContent = alreadyEarned ? '0（本日取得済み）' : state.expEarned;
       const newLv = calcLevel(data.totalExp);
-      if (newLv > prevLv) setTimeout(() => showLevelUp(newLv), 300);
+      if (newLv > prevLv) setTimeout(()=>showLevelUp(newLv), 400);
       playerData = data;
     }
-  } catch (e) {
-    // GAS通信失敗時はローカルのポイントテーブルで仮表示
-    document.getElementById('r-pts').textContent = state.ptsEarned + (state.ptsEarned > 0 ? '' : '');
+  } catch(e) {
+    document.getElementById('r-pts').textContent = state.ptsEarned;
     document.getElementById('r-exp').textContent = state.expEarned;
-    playerData.totalPoints = (playerData.totalPoints || 0) + state.ptsEarned;
-    playerData.totalExp = (playerData.totalExp || 0) + state.expEarned;
-    playerData.maxCombo = Math.max(playerData.maxCombo || 0, state.maxCombo);
-    playerData.totalGames = (playerData.totalGames || 0) + 1;
-    playerData.availablePoints = playerData.totalPoints - (playerData.spentPoints || 0);
+    playerData.totalPoints = (playerData.totalPoints||0) + state.ptsEarned;
+    playerData.totalExp    = (playerData.totalExp||0)    + state.expEarned;
+    playerData.maxCombo    = Math.max(playerData.maxCombo||0, state.maxCombo);
+    playerData.totalGames  = (playerData.totalGames||0)  + 1;
+    playerData.availablePoints = playerData.totalPoints - (playerData.spentPoints||0);
   }
 }
 
@@ -1121,119 +1321,181 @@ async function finishGame() {
 // LEVEL UP
 // ===========================
 function showLevelUp(lv) {
-  document.getElementById('levelUpLv').textContent = 'Lv.' + lv;
+  document.getElementById('levelUpLv').textContent = 'Lv.'+lv;
   document.getElementById('levelUpName').textContent = getCharName(lv);
   document.getElementById('levelUpOverlay').classList.add('show');
 }
-function closeLevelUp() {
-  document.getElementById('levelUpOverlay').classList.remove('show');
-}
+function closeLevelUp() { document.getElementById('levelUpOverlay').classList.remove('show'); }
 
 // ===========================
 // MENU
 // ===========================
-function backToMenu() {
-  showScreen('menuScreen');
-  updatePlayerUI();
-  displayBest();
-}
-
+function backToMenu() { showScreen('menuScreen'); updatePlayerUI(); displayBest(); }
 function restartSameLevel() { startGame(state.levelMode); }
 
 // ===========================
 // EXCHANGE
 // ===========================
 function openExchange() {
-  const avail = (playerData.totalPoints || 0) - (playerData.spentPoints || 0);
-  document.getElementById('exchAvailPts').textContent = avail;
+  document.getElementById('exchAvailPts').textContent = (playerData.totalPoints||0)-(playerData.spentPoints||0);
   document.getElementById('exchangeOverlay').classList.add('show');
 }
-function closeExchange() {
-  document.getElementById('exchangeOverlay').classList.remove('show');
-}
+function closeExchange() { document.getElementById('exchangeOverlay').classList.remove('show'); }
 async function doExchange(cost, itemName) {
-  const avail = (playerData.totalPoints || 0) - (playerData.spentPoints || 0);
-  if (avail < cost) {
-    showToast('ポイントが足りないよ！もっとがんばろう！');
-    return;
-  }
+  const avail = (playerData.totalPoints||0)-(playerData.spentPoints||0);
+  if (avail < cost) { showToast('ポイントが足りないよ！'); return; }
   if (!confirm(`「${itemName}」と交換する？\n${cost}ポイント使うよ`)) return;
-  playerData.spentPoints = (playerData.spentPoints || 0) + cost;
+  playerData.spentPoints = (playerData.spentPoints||0)+cost;
   playerData.availablePoints = playerData.totalPoints - playerData.spentPoints;
   document.getElementById('exchAvailPts').textContent = playerData.availablePoints;
   try {
-    await fetch(GAS_URL, {
-      method: 'POST', mode: 'no-cors',
-      body: JSON.stringify({ action: 'savePlayer', player: PLAYER_NAME, spentPoints: playerData.spentPoints })
-    });
-  } catch (e) {}
+    await fetch(GAS_URL, {method:'POST', mode:'no-cors',
+      body:JSON.stringify({action:'savePlayer', player:PLAYER_NAME, spentPoints:playerData.spentPoints})});
+  } catch(e) {}
   updatePlayerUI();
-  showToast(`🎉 ${itemName}と交換したよ！パパ/ママに見せよう！`);
+  showToast(`🎉 ${itemName}と交換！パパ/ママに見せよう！`);
   closeExchange();
 }
 
 // ===========================
 // STATS
 // ===========================
+let currentLvTab = '1';
+
 async function openStats() {
   document.getElementById('statsOverlay').classList.add('show');
+  document.getElementById('statsLoading').style.display = 'block';
+  document.getElementById('statsContent').style.display = 'none';
   try {
-    const res = await fetch(GAS_URL + '?action=getRecords');
+    const res = await fetch(GAS_URL+'?action=getRecords');
     rawChartData = await res.json();
+    document.getElementById('statsLoading').style.display = 'none';
+    document.getElementById('statsContent').style.display = 'block';
     renderCharts();
-  } catch (e) {
-    console.error('データ取得失敗', e);
-    showToast('⚠️ データ取得失敗。GASのデプロイURLを確認してね');
+    renderGasBest();
+  } catch(e) {
+    document.getElementById('statsLoading').textContent = '⚠️ データ取得失敗。GAS URLを確認してね。';
+    showToast('⚠️ データ取得失敗');
   }
 }
 function closeStats() { document.getElementById('statsOverlay').classList.remove('show'); }
 
 function updateRange(range, btn) {
   currentRange = range;
-  document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  // 期間ボタンのactiveを切り替え（lvTabBtnsのボタンは対象外）
+  btn.closest('.mc-range-btns').querySelectorAll('.mc-range-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCharts();
+}
+
+function updateLvTab(lv, btn) {
+  currentLvTab = lv;
+  document.getElementById('lvTabBtns').querySelectorAll('.mc-range-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
   renderCharts();
 }
 
 function renderCharts() {
-  if (!rawChartData || rawChartData.length === 0) return;
+  if (!rawChartData || rawChartData.length===0) return;
+  // レベルフィルター
+  const filtered = currentLvTab==='all'
+    ? rawChartData
+    : rawChartData.filter(d => String(d.level) === String(currentLvTab));
+
   const map = {};
-  rawChartData.forEach(d => {
-    const dateStr = String(d.date);
-    const key = currentRange === 'month' ? dateStr.substring(0, 7) : dateStr.substring(0, 10);
-    const p = Number(d.percent) || 0;
-    const t = Number(d.time) || 0;
-    if (!map[key]) map[key] = { label: key, maxP: p, minT: t };
+  filtered.forEach(d => {
+    const ds = String(d.date);
+    const key = currentRange==='month' ? ds.slice(0,7) : ds.slice(0,10);
+    const p = Number(d.percent)||0, t = Number(d.time)||0;
+    if (!map[key]) map[key] = {label:key, maxP:p, minT:t};
     else {
-      if (p > map[key].maxP) map[key].maxP = p;
-      if (t > 0 && (map[key].minT === 0 || t < map[key].minT)) map[key].minT = t;
+      if(p>map[key].maxP) map[key].maxP=p;
+      if(t>0&&(map[key].minT===0||t<map[key].minT)) map[key].minT=t;
     }
   });
-  let sorted = Object.values(map).sort((a, b) => a.label.localeCompare(b.label));
-  if (currentRange === 'day') sorted = sorted.slice(-14);
-  else if (currentRange === 'month') sorted = sorted.slice(-12);
-  const labels = sorted.map(d => currentRange === 'day' ? d.label.slice(5) : d.label);
+  let sorted = Object.values(map).sort((a,b)=>a.label.localeCompare(b.label));
+  if (currentRange==='day') sorted=sorted.slice(-14);
+  else if (currentRange==='month') sorted=sorted.slice(-12);
+  const labels = sorted.map(d=>currentRange==='day'?d.label.slice(5):d.label);
   const opts = {
-    responsive: true,
-    scales: {
-      y: { grid: { color: '#1a2235' }, ticks: { color: '#666', font: { size: 9 } } },
-      x: { grid: { color: '#1a2235' }, ticks: { color: '#666', font: { size: 9 } } }
+    responsive:true,
+    scales:{
+      y:{grid:{color:'#555'}, ticks:{color:'#888',font:{size:9}}},
+      x:{grid:{color:'#555'}, ticks:{color:'#888',font:{size:9}}}
     },
-    plugins: { legend: { labels: { color: '#888', font: { size: 10 } } } },
-    elements: { line: { tension: 0.3 }, point: { radius: currentRange === 'all' ? 2 : 4 } }
+    plugins:{legend:{labels:{color:'#1a1a1a',font:{size:10}}}},
+    elements:{line:{tension:0},point:{radius:currentRange==='all'?2:4}}
   };
   if (window.scChart) window.scChart.destroy();
   window.scChart = new Chart(document.getElementById('scoreChart'), {
-    type: 'line',
-    data: { labels, datasets: [{ label: '最高正解率(%)', data: sorted.map(d => d.maxP), borderColor: '#4fc3f7', backgroundColor: 'rgba(79,195,247,0.1)', fill: true }] },
-    options: opts
+    type:'line',
+    data:{labels, datasets:[{label:'最高正解率(%)', data:sorted.map(d=>d.maxP), borderColor:'#2e6e6e', backgroundColor:'rgba(46,110,110,0.2)', fill:true}]},
+    options:opts
   });
   if (window.tmChart) window.tmChart.destroy();
   window.tmChart = new Chart(document.getElementById('timeChart'), {
-    type: 'line',
-    data: { labels, datasets: [{ label: '最速タイム(秒)', data: sorted.map(d => d.minT), borderColor: '#ff4757' }] },
-    options: opts
+    type:'line',
+    data:{labels, datasets:[{label:'最速タイム(秒)', data:sorted.map(d=>d.minT), borderColor:'#c03030'}]},
+    options:opts
   });
+}
+
+// GASのrecordsシートからベストを計算してメイン画面とstats両方に反映
+function renderGasBest() {
+  if (!rawChartData || rawChartData.length===0) return;
+  const best = {}; // { lv: {maxP, minT} }
+  rawChartData.forEach(d => {
+    const lv = String(d.level);
+    const p = Number(d.percent)||0, t = Number(d.time)||0;
+    if (!best[lv]) best[lv] = {maxP:p, minT: p===100?t:9999};
+    else {
+      if(p > best[lv].maxP) best[lv].maxP = p;
+      if(p===100 && t>0 && t < best[lv].minT) best[lv].minT = t;
+    }
+  });
+
+  // メイン画面のベストレコード更新
+  const row = document.getElementById('bestRow');
+  row.innerHTML = '';
+  [1,2,3,4,5].forEach(i => {
+    const b = best[String(i)];
+    const p = b ? b.maxP : 0;
+    const t = (b && b.minT < 9999) ? b.minT+'s' : '-';
+    const chip = document.createElement('div');
+    chip.className = 'mc-chip' + (p>=100?' gold':'');
+    chip.textContent = `LV${i}: ${p}%(${t})`;
+    row.appendChild(chip);
+  });
+
+  // stats内のベストレコード
+  const gasRow = document.getElementById('gasBestRow');
+  gasRow.innerHTML = '';
+  [1,2,3,4,5].forEach(i => {
+    const b = best[String(i)];
+    const p = b ? b.maxP : '-';
+    const t = (b && b.minT < 9999) ? b.minT+'s' : '-';
+    const chip = document.createElement('div');
+    chip.className = 'mc-chip' + (p>=100?' gold':'');
+    chip.textContent = `LV${i}: ${p}%(${t})`;
+    gasRow.appendChild(chip);
+  });
+}
+
+// ===========================
+// SYNC
+// ===========================
+async function syncWithGAS() {
+  const btn = document.getElementById('syncBtn');
+  btn.classList.add('syncing');
+  btn.textContent = '🔄 同期中...';
+  try {
+    const res = await fetch(GAS_URL+'?action=getPlayer&player='+encodeURIComponent(PLAYER_NAME));
+    const data = await res.json();
+    if (data && !data.error) { playerData=data; updatePlayerUI(); showToast('✅ 同期完了！'); }
+    else showToast('⚠️ データが見つかりませんでした');
+  } catch(e) { showToast('⚠️ 同期失敗'); }
+  btn.classList.remove('syncing');
+  btn.textContent = '🔄 スプシと同期';
 }
 
 // ===========================
@@ -1241,10 +1503,10 @@ function renderCharts() {
 // ===========================
 async function loadPlayer() {
   try {
-    const res = await fetch(GAS_URL + '?action=getPlayer&player=' + encodeURIComponent(PLAYER_NAME));
+    const res = await fetch(GAS_URL+'?action=getPlayer&player='+encodeURIComponent(PLAYER_NAME));
     const data = await res.json();
     if (data && !data.error) playerData = data;
-  } catch (e) {}
+  } catch(e) {}
   updatePlayerUI();
 }
 
@@ -1252,30 +1514,35 @@ async function loadPlayer() {
 // ENTER KEY
 // ===========================
 document.getElementById('capitalAnswer').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    if (document.getElementById('ansBtn').style.display !== 'none' && document.getElementById('ansBtn').style.display !== '') {
-      checkAnswer();
-    } else {
-      nextQuestion();
-    }
-  }
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('ansBtn').style.display !== 'none') checkAnswer();
+  else nextQuestion();
 });
 
 // ===========================
 // TIMER
 // ===========================
 setInterval(() => {
-  const sec = Math.floor((Date.now() - sessionStartTime) / 1000);
-  document.getElementById('playTime').textContent = `SESSION ${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+  const sec = Math.floor((Date.now()-sessionStartTime)/1000);
+  document.getElementById('playTime').textContent = `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
 }, 1000);
 
 // ===========================
 // INIT
 // ===========================
-window.onload = () => {
-  displayBest();
-  loadPlayer();
-};
+// v2→v3 キー移行（旧LV4→新LV3, 旧LV5→新LV4, 旧LV6→新LV5）
+function migrateLocalStorage() {
+  const map = [[4,3],[5,4],[6,5]];
+  map.forEach(([o,n]) => {
+    ['best_p_','best_t_'].forEach(pre => {
+      const ok = pre+o, nk = pre+n;
+      if (localStorage.getItem(ok) !== null && localStorage.getItem(nk) === null)
+        localStorage.setItem(nk, localStorage.getItem(ok));
+    });
+  });
+}
+
+window.onload = () => { migrateLocalStorage(); displayBest(); loadPlayer(); };
 </script>
 </body>
 </html>
